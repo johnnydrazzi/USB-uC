@@ -5,4 +5,6 @@ Program by simply dragging and dropping your Intel hex file onto the device and 
   
 **Currently supports:**
 - PIC18F27J53 
-- PIC18F47J53 
+- PIC18F47J53  
+  
+For more information visit the [Project Page](https://hackaday.io/project/63204-usb-c) on Hackaday.io.

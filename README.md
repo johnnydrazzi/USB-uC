@@ -4,6 +4,8 @@ A bootloader for PIC microcontrollers, that makes your USB capable PIC appear to
 Program by simply dragging and dropping your Intel hex file onto the device and your'e done. No drivers or software to install.  
   
 **Currently supports:**
+- PIC18F25K50 
+- PIC18F45K50  
 - PIC18F27J53 
 - PIC18F47J53  
   

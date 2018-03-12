@@ -16,6 +16,5 @@ A bootloader for PIC microcontrollers, that makes your USB capable PIC appear to
 - PIC16F1455
 - PIC16F1459
 - PIC18F14K50
-- PIC18F24K50
   
 For more information visit the [Project Page](https://hackaday.io/project/63204-usb-c) on Hackaday.io.

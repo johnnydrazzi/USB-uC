@@ -1,6 +1,14 @@
 # USB uC
 ![Alt text](Images/USB_uC_27J53_2.jpg?raw=true "USB_uC_27J53")    
-A bootloader for PIC microcontrollers, that makes your USB capable PIC appear to your computer as a USB Mass Storage Device. Programming can be done through MPLABX or by simply dragging and dropping your Intel hex file onto the device. No programmer, drivers or software to install.
+A bootloader for PIC microcontrollers, that makes your USB capable PIC appear to your computer as a USB Mass Storage Device. Programming can be done through MPLABX or by simply dragging and dropping your Intel hex file onto the device. No programmer, drivers or software to install.  
+
+**Features:**
+- Different crystal options, including NO_XTAL for K family.
+- Drag and drop programming or through MPLABX.
+- Read user flash as a PROG_MEM.BIN file.
+- Erase user flash by deleting PROG_MEM.BIN.
+- Read and write to EEPROM through a EEPROM.BIN file.
+- Erase EEPROM by deleting EEPROM.BIN.
   
 **Currently supports:**
 - PIC18F14K50

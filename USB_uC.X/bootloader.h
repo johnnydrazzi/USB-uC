@@ -135,33 +135,9 @@
     0x1FFFF |______________|
  */
 
-// Uncomment to create a volume without files.
-//#define SIMPLE_BOOTLOADER
+#include "config.h"
 
-#define ROOT_ENTRY_COUNT 16
-#define FAT_SIZE 17
-
-#define BOOT_SECT_ADDR     0
-#define FAT_SECT_ADDR      1
-#define ROOT_SECT_ADDR     18
-#define DATA_SECT_ADDR     19
-#if defined(_PIC14E)
-#define SIMPLE_BOOTLOADER
-
-#elif defined(_18F14K50) || defined(_18F24K50) || defined(_18F25K50) || defined(_18F45K50)
-#define ABOUT_SECT_ADDR    DATA_SECT_ADDR
-#define EEPROM_SECT_ADDR   20
-#define PROG_MEM_SECT_ADDR 21
-
-#elif defined(__J_PART)
-#define ABOUT_SECT_ADDR    DATA_SECT_ADDR
-#define PROG_MEM_SECT_ADDR 20
-#endif
-
-#define BOOT_DUMMY    0
-#define BOOT_LOAD_HEX 1
-#define BOOT_FINISHED 2
-
+// Memory Regions.
 #if defined(_PIC14E)
 #define BOOT_REGION_START     0x00000
 #define PROG_REGION_START     0x02000
@@ -169,6 +145,7 @@
 #define CONFIG_REGION_START   0x10000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
 #define CONFIG_PAGE_START     CONFIG_REGION_START
+#define DEV_ID_START          0x1000C
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x2000 // In bytes
@@ -181,6 +158,7 @@
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
 #define CONFIG_PAGE_START     CONFIG_REGION_START
+#define DEV_ID_START          0x3FFFFE
 #define EEPROM_REGION_START   0xF00000
 #define END_OF_EEPROM         0xF00100
 #define EEPROM_SIZE           0x100
@@ -196,6 +174,7 @@
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
 #define CONFIG_PAGE_START     CONFIG_REGION_START
+#define DEV_ID_START          0x3FFFFE
 #define EEPROM_REGION_START   0xF00000
 #define END_OF_EEPROM         0xF00100
 #define EEPROM_SIZE           0x100
@@ -210,6 +189,7 @@
 #define CONFIG_REGION_START   0x0FFF8
 #define CONFIG_PAGE_START     0x0FC00
 #define END_OF_FLASH          0x10000
+#define DEV_ID_START          0x3FFFFE
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x0E000 // In bytes
@@ -221,16 +201,35 @@
 #define CONFIG_REGION_START   0x1FFF8
 #define CONFIG_PAGE_START     0x1FC00
 #define END_OF_FLASH          0x20000
+#define DEV_ID_START          0x3FFFFE
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x1E000 // In bytes
 #endif
 
-#define FILE_CLUSTERS (FILE_SIZE / 512)
-
+// Make changes based on if has EEPROM or not.
 #ifdef EEPROM_REGION_START
 #define HAS_EEPROM
 #endif
+
+// FAT16 File system constants.
+#define ROOT_ENTRY_COUNT 16
+#define FAT_SIZE 17
+
+#define BOOT_SECT_ADDR     0
+#define FAT_SECT_ADDR      1
+#define ROOT_SECT_ADDR     18
+#define DATA_SECT_ADDR     19
+#ifndef HAS_EEPROM
+#define ABOUT_SECT_ADDR    DATA_SECT_ADDR
+#define PROG_MEM_SECT_ADDR 20
+#else
+#define ABOUT_SECT_ADDR    DATA_SECT_ADDR
+#define EEPROM_SECT_ADDR   20
+#define PROG_MEM_SECT_ADDR 21
+#endif
+
+#define FILE_CLUSTERS (FILE_SIZE / 512)
 
 #ifdef HAS_EEPROM
 #define PROG_MEM_CLUST 4
@@ -238,6 +237,12 @@
 #define PROG_MEM_CLUST 3
 #endif
 
+// Bootloader State.
+#define BOOT_DUMMY    0
+#define BOOT_LOAD_HEX 1
+#define BOOT_FINISHED 2
+
+// Hex Parser State.
 #define HEX_START       0
 #define HEX_REC_LEN     1
 #define HEX_LOAD_OFFSET 2
@@ -253,6 +258,7 @@
 #define HEX_FINISHED   12
 #define HEX_FAULT      13
 
+// Hex File Record Types.
 #define  DATA_REC 0 // Data Record
 #define  EOF_REC  1 // End of File Record
 #define  ESA_REC  2 // Extended Segment Address Record
@@ -260,6 +266,7 @@
 #define  ELA_REC  4 // Extended Linear Address Record
 #define  SLA_REC  5 // Start Linear Address Record
 
+// Volume Labels based on proccessor.
 #if defined(_PIC14E)
 #define VOLUME_LABEL {'P','I','C','1','6','F','1','4','5','X',' '}
 #elif defined(_18F14K50)
@@ -327,22 +334,23 @@ const BOOT16_t BOOT16 = {
     {'F','A','T','1','6',' ',' ',' '}
 };
 
-/** Directory Entry Structure */
-typedef struct
-{
-    uint8_t  Name[11];
-    uint8_t  Attr;
-    uint8_t  NTRes;
-    uint8_t  CrtTimeTenth;
-    uint16_t CrtTime;
-    uint16_t CrtDate;
-    uint16_t LstAccDate;
-    uint16_t FstClusHI;
-    uint16_t WrtTime;
-    uint16_t WrtDate;
-    uint16_t FstClusLO;
-    uint32_t FileSize;
-}DIR_ENTRY_t;
+///** Directory Entry Structure */
+//typedef struct
+//{
+//    uint8_t  Name[11];
+//    uint8_t  Attr;
+//    uint8_t  NTRes;
+//    uint8_t  CrtTimeTenth;
+//    uint16_t CrtTime;
+//    uint16_t CrtDate;
+//    uint16_t LstAccDate;
+//    uint16_t FstClusHI;
+//    uint16_t WrtTime;
+//    uint16_t WrtDate;
+//    uint16_t FstClusLO;
+//    uint32_t FileSize;
+//}DIR_ENTRY_t;
+typedef uint8_t DIR_ENTRY_t[11];
 
 /** Root Directory Type */
 typedef struct
@@ -357,74 +365,21 @@ typedef struct
     #endif
 }ROOT_DIR_t;
 
-const uint8_t aboutFile[] = "<html><head><meta http-equiv=\"refresh\" content=\"0;URL='https://github.com/johnnydrazzi/USB-uC'\" /></head></html>";
+const uint8_t aboutFile[] = "<html><script>window.location=\"https://github.com/johnnydrazzi/USB-uC\";</script></html>";
 
 /** Volume Root Entry */
 const ROOT_DIR_t ROOT =
 {
-    {
-        ROOT_NAME,
-        0x08,
-        0,
-        0,
-        0x7BA0,
-        0x4B0B,
-        0x4B0B,
-        0,
-        0x7BA0,
-        0x4B0B,
-        0,
-        0
-    },
+    ROOT_NAME,
     #if !defined(SIMPLE_BOOTLOADER)
-    {
-       {'A','B','O','U','T',' ',' ',' ','H','T','M'},
-        0x20,
-        0,
-        0,
-        0x7BA0,
-        0x4B0B,
-        0x4B0B,
-        0,
-        0x7BA0,
-        0x4B0B,
-        2,
-        sizeof(aboutFile)
-    },
+    {'A','B','O','U','T',' ',' ',' ','H','T','M'},
     #if defined(HAS_EEPROM)
-    {
-       {'E','E','P','R','O','M',' ',' ','B','I','N'},
-        0x20,
-        0,
-        0,
-        0x7BA0,
-        0x4B0B,
-        0x4B0B,
-        0,
-        0x7BA0,
-        0x4B0B,
-        3,
-        EEPROM_SIZE
-    },
+    {'E','E','P','R','O','M',' ',' ','B','I','N'},
     #endif
-    {
-       {'P','R','O','G','_','M','E','M','B','I','N'},
-        0x20,
-        0,
-        0,
-        0x7BA0,
-        0x4B0B,
-        0x4B0B,
-        0,
-        0x7BA0,
-        0x4B0B,
-        PROG_MEM_CLUST,
-        FILE_SIZE
-    }
+    {'P','R','O','G','_','M','E','M','B','I','N'}
     #endif
 };
 
-extern const uint16_t* g_user_first_inst;
 extern bool g_boot_reset;
 
 void boot_process_read(void);

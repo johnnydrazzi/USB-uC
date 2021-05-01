@@ -10,9 +10,9 @@ CND_CONF=PIC18F45K50
 CND_DISTDIR=dist
 TMPDIR=build/${CND_CONF}/${IMAGE_TYPE}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/USB_uC_X5K50.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
-OUTPUT_BASENAME=USB_uC_X5K50.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
-PACKAGE_TOP_DIR=usbucx5k50.x/
+OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/USB_uC.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+OUTPUT_BASENAME=USB_uC.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+PACKAGE_TOP_DIR=usbuc.x/
 
 # Functions
 function checkReturnCode
@@ -57,15 +57,15 @@ mkdir -p ${TMPDIR}
 
 # Copy files and create directories and links
 cd "${TOP}"
-makeDirectory ${TMPDIR}/usbucx5k50.x/bin
+makeDirectory ${TMPDIR}/usbuc.x/bin
 copyFileToTmpDir "${OUTPUT_PATH}" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755
 
 
 # Generate tar file
 cd "${TOP}"
-rm -f ${CND_DISTDIR}/${CND_CONF}/package/usbucx5k50.x.tar
+rm -f ${CND_DISTDIR}/${CND_CONF}/package/usbuc.x.tar
 cd ${TMPDIR}
-tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/package/usbucx5k50.x.tar *
+tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/package/usbuc.x.tar *
 checkReturnCode
 
 # Cleanup

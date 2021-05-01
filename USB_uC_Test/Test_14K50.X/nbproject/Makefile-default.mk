@@ -86,7 +86,7 @@ FIXDEPS=fixDeps
 
 # The following macros may be used in the pre and post step lines
 Device=PIC18F14K50
-ProjectDir="C:\Users\John\Desktop\USB_uC_Test\Test_14K50.X"
+ProjectDir="C:\Users\John\Documents\GitHub\USB-uC\USB_uC_Test\Test_14K50.X"
 ProjectName=Test_14K50
 ConfName=default
 ImagePath="dist\default\${IMAGE_TYPE}\Test_14K50.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}"
@@ -112,7 +112,7 @@ MP_PROCESSOR_OPTION=18F14K50
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.p1.d 
 	@${RM} ${OBJECTDIR}/main.p1 
@@ -121,7 +121,7 @@ ${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${FIXDEPS} ${OBJECTDIR}/main.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
 else
-${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.p1.d 
 	@${RM} ${OBJECTDIR}/main.p1 

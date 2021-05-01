@@ -2,10 +2,10 @@
  * @file usb_msd.c
  * @brief Contains <i>Mass Storage Class</i> functions.
  * @author John Izzard
- * @date 05/06/2020
+ * @date 20/04/2021
  * 
  * USB uC - MSD Library.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2021  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,10 +73,13 @@ uint8_t g_msd_sect_data[512];
 /******************************************************************************/
 
 msd_cbw_t                 g_msd_cbw __at(CBW_DATA_ADDR);
-msd_csw_t                 g_msd_csw;
+msd_csw_t                 g_msd_csw __at(CBW_DATA_ADDR);
 msd_rw_10_vars_t          g_msd_rw_10_vars;
 msd_bytes_to_transfer_t   g_msd_bytes_to_transfer;
-scsi_fixed_format_sense_t g_msd_fixed_format_sense;
+uint8_t                   g_msd_sense_key;
+uint8_t                   g_msd_additional_sense_code;
+uint8_t                   g_msd_additional_sense_code_qualifier;
+
 
 #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
 scsi_read_capacity_10_t g_msd_read_capacity_10;
@@ -103,7 +106,7 @@ static scsi_mode_select_6_cmd_t    m_mode_select_6_cmd    __at(CBW_DATA_ADDR + 1
 static scsi_pamr_cmd_t             m_pamr_cmd             __at(CBW_DATA_ADDR + 15);
 
 volatile static uint8_t m_msd_state;
-volatile static bool    m_end_data_in_short;
+volatile static bool    m_end_data_short;
 volatile static bool    m_wait_for_bomsr;
 volatile static bool    m_clear_halt_event;
 
@@ -137,15 +140,13 @@ extern const scsi_inquiry_t g_scsi_inquiry;
 /******************************************************************************/
 
 /**
- * @fn uint8_t service_cbw(void)
+ * @fn void service_cbw(void)
  * 
  * @brief Used to service Command Block Wrapper on MSD's Endpoint.
  * 
  * The function parses the Command Block, and responds to SCSI Commands.
- * 
- * @return Returns the CBW Result.
  */
-static uint8_t service_cbw(void);
+static void service_cbw(void);
 
 /**
  * @fn void setup_cbw(void)
@@ -166,128 +167,89 @@ static void setup_cbw(void);
 static void setup_csw(void);
 
 /**
- * @fn bool service_read10(void)
+ * @fn void service_read10(void)
  * 
  * @brief Services the READ_10 SCSI Command.
- * 
- * @return Returns true when all data is sent.
  */
-static bool service_read10(void);
+static void service_read10(void);
 
 /**
- * @fn bool service_write10(void)
+ * @fn void service_write10(void)
  * 
  * @brief Services the WRITE_10 SCSI Command.
- * 
- * @return Returns true when all data is received.
  */
-static bool service_write10(void);
+static void service_write10(void);
 
 /**
- * @fn void calc_residue(uint16_t case_result, uint32_t device_bytes)
- * 
- * @brief Calculates residue for CSW.
- * 
- * @param case_result The result of checking for 13 error cases.
- * @param device_bytes The amount of bytes the device wishes to send.
- * 
- * <b>Code Example:</b>
- * <ul style="list-style-type:none"><li>
- * @code
- * calc_residue(case_result, 8);
- * @endcode
- * </li></ul>
- */
-static void calc_residue(uint16_t case_result, uint32_t device_bytes);
-
-/**
- * @fn uint16_t check_13_cases(uint32_t device_bytes, uint8_t dev_expect)
+ * @fn bool check_13_cases(uint32_t device_bytes, uint8_t dev_expect)
  * 
  * @brief Checks 13 possible error/non-error cases.
  * 
  * @param device_bytes The amount of bytes the device wishes to send.
  * @param dev_expect The direction the device expects data to transfer.
- * @return case_result The case detected.
+ * @return pass_fail True if COMMAND_PASSED, false if PHASE_ERROR.
  * 
  * <b>Code Example:</b>
  * <ul style="list-style-type:none"><li>
  * @code
- * case_result = check_13_cases(g_msd_rw_10_vars.TF_LEN_IN_BYTES, Di);
+ * check_13_cases(g_msd_rw_10_vars.TF_LEN_IN_BYTES, Di);
  * @endcode
  * </li></ul>
  */
-static uint16_t check_13_cases(uint32_t device_bytes, uint8_t dev_expect);
+static bool check_13_cases(uint32_t device_bytes, uint8_t dev_expect);
 
 /**
  * @fn bool cbw_valid(void)
  * 
  * @brief Checks if CBW is valid.
  * 
- * @return Valid Returns true if valid.
+ * @return valid Returns true if valid.
  */
 static bool cbw_valid(void);
 
 /**
- * @fn void reset_sense(void)
+ * @fn void fail_command(void)
  * 
- * @brief Resets Sense Data to default (no error) values.
- */
-static void reset_sense(void);
-
-/**
- * @fn uint8_t fail_command(uint8_t dev_expect)
+ * @brief Response to a failed SCSI command.
  * 
- * @brief Response to an failed SCSI command.
- * 
- * The function will stall either MSD's IN Endpoint or OUT depending on data direction and set the
- * appropriate sense data. A COMMAND_FAILED status is returned in the CSW stage.
- * 
- * @param dev_expect The direction the device expects data to transfer.
- * @return RESULT Returns the next mass storage state.
+ * If the host is expecting no data transfer (Hn), ready the CSW.
+ * The function will stall either MSD's IN Endpoint or OUT depending on data 
+ * direction. A COMMAND_FAILED status is returned in the CSW stage.
  * 
  * <b>Code Example:</b>
  * <ul style="list-style-type:none"><li>
  * @code
- * return fail_command(Di);
+ * fail_command();
  * @endcode
  * </li></ul>
  */
-static uint8_t fail_command(uint8_t dev_expect);
+static void fail_command(void);
 
 /**
- * @fn uint8_t no_data_response(uint8_t status)
+ * @fn void send_data_response(uint8_t device_bytes)
  * 
- * @brief Handles SCSI commands where no data stage is expected.
- * 
- * @param status The COMMAND_STATUS value returned in the CSW stage.
- * @return RESULT Returns the next mass storage state.
- */
-static uint8_t no_data_response(uint8_t status);
-
-/**
- * @fn uint8_t send_data_response(uint32_t device_bytes)
- * 
- * @brief Handles SCSI commands where data stage is expected.
+ * @brief Handles SCSI commands where data in stage is expected and less than
+ * MSD_EP_SIZE in size. Basically all commands expecting data except READ_10
+ * and WRITE_10.
  * 
  * @param device_bytes The amount of bytes the device wishes to send.
- * @return RESULT Returns the next mass storage state.
  */
-static uint8_t send_data_response(uint32_t device_bytes);
+static void send_data_response(uint8_t device_bytes);
 
 /**
  * @fn void cause_bomsr(void)
  * 
  * @brief Causes a Bulk Only Mass Storage Reset.
  * 
- * The function stalls all MSD's Endpoints. The function is used when a serious error
- * has occurred and the devices wishes to re-sync with the computer.
+ * The function stalls all MSD's Endpoints. The function is used when a serious 
+ * error has occurred and the devices wishes to re-sync with the computer.
  */
 static void cause_bomsr(void);
 
 /**
  * @fn void invalid_command_sense(void)
  * 
- * @brief Sets the sense values for Illegal Request.
+ * @brief Sets the sense values for common Illegal Request.
  */
 static void invalid_command_sense(void);
 
@@ -308,8 +270,8 @@ static void unit_attention_sense(void);
 /**
  * @fn bool check_for_media(void)
  * 
- * @brief Checks to see if media is present/available. Also sets m_unit_attention 
- * value to true when the media availability changes.
+ * @brief Checks to see if media is present/available. Also sets 
+ * m_unit_attention value to true when the media availability changes.
  * 
  * @return Returns true when media is present.
  */
@@ -356,6 +318,30 @@ void msd_arm_ep_in(uint16_t cnt)
     g_usb_bd_table[MSD_BD_IN].STAT     |= _UOWN;
 }
 #endif
+
+void msd_stall_ep_out(void)
+{
+    #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
+    g_usb_ep_stat[MSD_EP][OUT].Halt  = 1;
+    usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT_EVEN]);
+    usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT_ODD]);
+    #else
+    g_usb_ep_stat[MSD_EP][OUT].Halt  = 1;
+    usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT]);
+    #endif
+}
+
+void msd_stall_ep_in(void)
+{
+    #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
+    g_usb_ep_stat[MSD_EP][IN].Halt  = 1;
+    usb_stall_ep(&g_usb_bd_table[MSD_BD_IN_EVEN]);
+    usb_stall_ep(&g_usb_bd_table[MSD_BD_IN_ODD]);
+    #else
+    g_usb_ep_stat[MSD_EP][IN].Halt  = 1;
+    usb_stall_ep(&g_usb_bd_table[MSD_BD_IN]);
+    #endif
+}
 
 
 bool msd_class_request(void)
@@ -419,14 +405,12 @@ void msd_init(void)
     
     m_wait_for_bomsr    = false;
     m_unit_attention    = false;
-    m_end_data_in_short = false;
+    m_end_data_short    = false;
     m_clear_halt_event  = false;
     
     m_task_cnt       = 0;
     m_task_put_index = 0;
     m_task_get_index = 0;
-    
-    reset_sense();
     
     setup_cbw();
 }
@@ -458,12 +442,11 @@ void msd_tasks(void)
             {
                 #ifdef USE_WRITE_10
                 case MSD_WRITE_DATA:
-                    if(service_write10()) setup_csw();
+                    service_write10();
                     break;
                 #endif
                 case MSD_CBW:
-                    m_msd_state = service_cbw();
-                    if(m_msd_state == MSD_NO_DATA_STAGE) setup_csw();
+                    service_cbw();
                     break;
             }
         }
@@ -476,14 +459,7 @@ void msd_tasks(void)
             switch(m_msd_state)
             {
                 case MSD_READ_DATA:
-                    if(service_read10())
-                    {
-                        #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-                        m_msd_state = MSD_READ_FINISHED;
-                        #else
-                        m_msd_state = MSD_DATA_SENT;
-                        #endif
-                    }
+                    service_read10();
                     break;
                 #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
                 case MSD_READ_FINISHED:
@@ -491,16 +467,11 @@ void msd_tasks(void)
                     break;
                 #endif
                 case MSD_DATA_SENT:
-                    if(m_end_data_in_short)
+                    if(m_end_data_short)
                     {
-                        g_usb_ep_stat[MSD_EP][IN].Halt = 1;
-                        #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-                        usb_stall_ep(&g_usb_bd_table[MSD_BD_IN_EVEN]);
-                        usb_stall_ep(&g_usb_bd_table[MSD_BD_IN_ODD]);
-                        #else
-                        usb_stall_ep(&g_usb_bd_table[MSD_BD_IN]);
-                        #endif
-                        m_end_data_in_short = false;
+                        msd_stall_ep_in();
+                        m_end_data_short = false;
+                        m_msd_state = MSD_WAIT_CLEAR;
                         break;
                     }
                     setup_csw();
@@ -516,14 +487,8 @@ void msd_tasks(void)
     }
     else if(m_clear_halt_event)
     {
-        if(m_msd_state == MSD_WAIT_IVALID)
-        {
-            setup_cbw();
-        }
-        else if(m_msd_state == MSD_WAIT_ILLEGAL || m_msd_state == MSD_DATA_SENT)
-        {
-            setup_csw();
-        }
+        if(m_msd_state == MSD_WAIT_BOMSR) setup_cbw();
+        else if(m_msd_state == MSD_WAIT_CLEAR) setup_csw();
         m_clear_halt_event = false;
     }
     USB_INTERRUPT_ENABLE = 1;
@@ -555,9 +520,8 @@ void msd_clear_ep_toggle(void)
 }
 
 
-static uint8_t service_cbw(void)
+static void service_cbw(void)
 {
-    uint16_t case_result;
     uint8_t  dev_expect;
 
     #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
@@ -578,12 +542,7 @@ static uint8_t service_cbw(void)
     usb_ram_copy(g_msd_ep_out, g_msd_cbw.BYTES, 31);
     #endif
     
-    if(!cbw_valid())
-    {
-        cause_bomsr();
-        return MSD_WAIT_IVALID;
-    }
-    g_msd_csw.dCSWTag = g_msd_cbw.dCBWTag;
+    if(!cbw_valid()) return;
     
     switch(g_msd_cbw.CBWCB0[0])
     {
@@ -593,17 +552,17 @@ static uint8_t service_cbw(void)
             {
             #endif
                 #if !defined(USE_WRITE_10) || defined(USE_WR_PROTECT)
-                reset_sense();
-                g_msd_fixed_format_sense.SENSE_KEY                       = DATA_PROTECT;
-                g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE           = ASC_WRITE_PROTECTED;
-                g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE_QUALIFIER = ASCQ_WRITE_PROTECTED;
-                return fail_command(Do);
+                g_msd_sense_key                       = DATA_PROTECT;
+                g_msd_additional_sense_code           = ASC_WRITE_PROTECTED;
+                g_msd_additional_sense_code_qualifier = ASCQ_WRITE_PROTECTED;
+                fail_command();
+                return;
                 #endif
             #if defined(USE_WRITE_10) && defined(USE_WR_PROTECT)
             }
             #endif
         case READ_10:
-            #ifdef USE_WRITE_10	
+            #ifdef USE_WRITE_10
             if(g_msd_cbw.CBWCB0[0] == READ_10) dev_expect = Di;	
             else dev_expect = Do;	
             #else	
@@ -614,13 +573,18 @@ static uint8_t service_cbw(void)
             if(!check_for_media())
             {
                 media_not_present_sense();
-                return fail_command(dev_expect);
+                fail_command();
+                return;
             }
             #endif
             g_msd_rw_10_vars.TF_LEN_BYTES[0] = m_read_10_cmd.TF_LEN_BYTES[1];
             g_msd_rw_10_vars.TF_LEN_BYTES[1] = m_read_10_cmd.TF_LEN_BYTES[0];
             
-            if(g_msd_rw_10_vars.TF_LEN == 0) return no_data_response(COMMAND_PASSED);
+            if(g_msd_rw_10_vars.TF_LEN == 0)
+            {
+                check_13_cases(0, Dn);
+                return;
+            }
             
             g_msd_rw_10_vars.START_LBA_BYTES[0] = m_read_10_cmd.LBA_BYTES[3];
             g_msd_rw_10_vars.START_LBA_BYTES[1] = m_read_10_cmd.LBA_BYTES[2];
@@ -630,26 +594,22 @@ static uint8_t service_cbw(void)
             
             if((g_msd_rw_10_vars.LBA + g_msd_rw_10_vars.TF_LEN) > VOL_CAPACITY_IN_BLOCKS)
             {
-                reset_sense();
-                g_msd_fixed_format_sense.SENSE_KEY                       = ILLEGAL_REQUEST;
-                g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE           = ASC_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE;
-                g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE_QUALIFIER = ASCQ_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE;
-                return fail_command(dev_expect);
+                g_msd_sense_key                       = ILLEGAL_REQUEST;
+                g_msd_additional_sense_code           = ASC_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE;
+                g_msd_additional_sense_code_qualifier = ASCQ_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE;
+                fail_command();
+                return;
             }
             
             g_msd_rw_10_vars.TF_LEN_IN_BYTES = ((uint32_t)g_msd_rw_10_vars.TF_LEN)*BYTES_PER_BLOCK_LE;
             
-            g_msd_rw_10_vars.CBW_TF_LEN = g_msd_cbw.dCBWDataTransferLength;
+            if(!check_13_cases(g_msd_rw_10_vars.TF_LEN_IN_BYTES, dev_expect)) return;
             
-            case_result = check_13_cases(g_msd_rw_10_vars.TF_LEN_IN_BYTES, dev_expect);
-            calc_residue(case_result, g_msd_rw_10_vars.TF_LEN_IN_BYTES);
+            g_msd_byte_of_sect = 0;
             
             #ifdef USE_WRITE_10
-            if(case_result & (CASE_11|CASE_12|CASE_13))
+            if(dev_expect == Do)
             {
-                if(case_result == CASE_13) g_msd_csw.bCSWStatus = PHASE_ERROR;
-                else g_msd_csw.bCSWStatus = COMMAND_PASSED;
-                g_msd_byte_of_sect = 0;
                 #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
                 msd_arm_ep_out((uint8_t)MSD_BD_OUT_EVEN + (MSD_EP_OUT_LAST_PPB ^ 1));
                 MSD_EP_OUT_DATA_TOGGLE_VAL ^= 1;
@@ -657,51 +617,37 @@ static uint8_t service_cbw(void)
                 #else
                 msd_arm_ep_out();
                 #endif
-                return MSD_WRITE_DATA;
+                m_msd_state = MSD_WRITE_DATA;
+                return;
             }
             #endif
-            if(case_result & (CASE_5|CASE_6|CASE_7))
-            {
-                if(case_result == CASE_7) g_msd_csw.bCSWStatus = PHASE_ERROR;
-                else g_msd_csw.bCSWStatus = COMMAND_PASSED;
-                g_msd_byte_of_sect = 0;
-                #ifdef MSD_LIMITED_RAM
-                #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
+            #ifdef MSD_LIMITED_RAM
+            #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
+            MSD_EP_IN_LAST_PPB ^= 1;
+            service_read10();
 
-                MSD_EP_IN_LAST_PPB ^= 1;
-                service_read10();
-                
-                MSD_EP_IN_DATA_TOGGLE_VAL ^= 1;
-                MSD_EP_IN_LAST_PPB ^= 1;
-                service_read10();
-                #else
-                service_read10();
-                #endif
-                #else
-                #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-                MSD_EP_IN_LAST_PPB ^= 1;
-                msd_rx_sector();
-                service_read10();
-                
-                MSD_EP_IN_DATA_TOGGLE_VAL ^= 1;
-                MSD_EP_IN_LAST_PPB ^= 1;
-                service_read10();
-                #else
-                msd_rx_sector();
-                service_read10();
-                #endif
-                #endif
-                return MSD_READ_DATA;
-            }
-            if(case_result & (CASE_2|CASE_3))
-            {
-                g_msd_csw.bCSWStatus = PHASE_ERROR;
-                return MSD_NO_DATA_STAGE;
-            }
-            g_msd_csw.bCSWStatus = PHASE_ERROR;
-            cause_bomsr();
-            return MSD_WAIT_ILLEGAL;
-            
+            MSD_EP_IN_DATA_TOGGLE_VAL ^= 1;
+            MSD_EP_IN_LAST_PPB ^= 1;
+            service_read10();
+            #else
+            service_read10();
+            #endif
+            #else
+            #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
+            MSD_EP_IN_LAST_PPB ^= 1;
+            msd_rx_sector();
+            service_read10();
+
+            MSD_EP_IN_DATA_TOGGLE_VAL ^= 1;
+            MSD_EP_IN_LAST_PPB ^= 1;
+            service_read10();
+            #else
+            msd_rx_sector();
+            service_read10();
+            #endif
+            #endif
+            m_msd_state = MSD_READ_DATA;
+            break;
             
         case TEST_UNIT_READY:
             #ifdef USE_EXTERNAL_MEDIA
@@ -710,28 +656,33 @@ static uint8_t service_cbw(void)
             {
                 m_unit_attention = false;
                 unit_attention_sense();
-                return fail_command(Dn);
+                fail_command();
+                return;
             }
             
             if(!m_media_present)
             {
                 media_not_present_sense();
-                return fail_command(Dn);
+                fail_command();
+                return;
             }
             #else
             if(m_unit_attention)
             {
                 m_unit_attention = false;
                 unit_attention_sense();
-                return fail_command(Dn);
+                fail_command();
+                return;
             }    
             #endif
             
             #ifdef USE_TEST_UNIT_READY
-            return no_data_response(msd_test_unit_ready());
+            if(check_13_cases(0, Dn) && msd_test_unit_ready()) fail_command();
             #else
-            return no_data_response(COMMAND_PASSED);
+            check_13_cases(0, Dn);
             #endif
+            break;
+            
             
         #ifdef USE_PREVENT_ALLOW_MEDIUM_REMOVAL
         case PREVENT_ALLOW_MEDIUM_REMOVAL:
@@ -739,12 +690,13 @@ static uint8_t service_cbw(void)
             if(!check_for_media())
             {
                 media_not_present_sense();
-                return fail_command(Dn);
+                fail_command();
+                return;
             }
             #endif
             invalid_command_sense();
-            return fail_command(Dn);
-        break;
+            fail_command();
+            break;
         #endif
             
             
@@ -754,19 +706,35 @@ static uint8_t service_cbw(void)
             if(g_msd_bytes_to_transfer.val)
             {
                 if(g_msd_bytes_to_transfer.val > 18) g_msd_bytes_to_transfer.val = 18;
+                
                 #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-                usb_ram_copy((uint8_t*)g_msd_fixed_format_sense.BYTE, in_ep_addr, g_msd_bytes_to_transfer.val);
+                usb_ram_set(0, in_ep_addr, g_msd_bytes_to_transfer.val);
+                
+                in_ep_addr[0] = CURRENT_FIXED; // RESPONSE_CODE
+                in_ep_addr[2] = g_msd_sense_key;
+                in_ep_addr[7] = 10; // ADDITIONAL_SENSE_LENGTH
+                in_ep_addr[12] = g_msd_additional_sense_code;
+                in_ep_addr[13] = g_msd_additional_sense_code_qualifier;
                 #else
-                usb_ram_copy((uint8_t*)g_msd_fixed_format_sense.BYTE, g_msd_ep_in, g_msd_bytes_to_transfer.val);
+                usb_ram_set(0, g_msd_ep_in, g_msd_bytes_to_transfer.val);
+                
+                g_msd_ep_in[0] = CURRENT_FIXED; // RESPONSE_CODE
+                g_msd_ep_in[2] = g_msd_sense_key;
+                g_msd_ep_in[7] = 10; // ADDITIONAL_SENSE_LENGTH
+                g_msd_ep_in[12] = g_msd_additional_sense_code;
+                g_msd_ep_in[13] = g_msd_additional_sense_code_qualifier;
                 #endif
-                return send_data_response(g_msd_bytes_to_transfer.val);
+                send_data_response(g_msd_bytes_to_transfer.val);
+                return;
             }
-            else return no_data_response(COMMAND_PASSED);
+            check_13_cases(0, Dn);
+            break;
             
             
         case INQUIRY:
             g_msd_bytes_to_transfer.LB = m_inquiry_cmd.ALLOCATION_LENGTH_BYTES[1];
             g_msd_bytes_to_transfer.HB = m_inquiry_cmd.ALLOCATION_LENGTH_BYTES[0];
+            
             if(g_msd_bytes_to_transfer.val)
             {
                 if(g_msd_bytes_to_transfer.val > 36) g_msd_bytes_to_transfer.val = 36;
@@ -775,9 +743,11 @@ static uint8_t service_cbw(void)
                 #else
                 usb_rom_copy((const uint8_t*)&g_scsi_inquiry, g_msd_ep_in, g_msd_bytes_to_transfer.val);
                 #endif
-                return send_data_response(g_msd_bytes_to_transfer.val);
+                send_data_response(g_msd_bytes_to_transfer.val);
+                return;
             } 
-            else return no_data_response(COMMAND_PASSED);
+            check_13_cases(0, Dn);
+            break;
             
             
         case MODE_SENSE_6:
@@ -788,8 +758,8 @@ static uint8_t service_cbw(void)
             if(!check_for_media())
             {
                 media_not_present_sense();
-                if(g_msd_bytes_to_transfer.val) return fail_command(Di);
-                else return fail_command(Dn);
+                fail_command();
+                return;
             }
             #endif
             
@@ -803,9 +773,11 @@ static uint8_t service_cbw(void)
                 #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
                 usb_ram_copy((uint8_t*)&g_msd_mode_sense, in_ep_addr, g_msd_bytes_to_transfer.val);
                 #endif
-                return send_data_response(g_msd_bytes_to_transfer.val);
+                send_data_response(g_msd_bytes_to_transfer.val);
+                return;
             }
-            else return no_data_response(COMMAND_PASSED);
+            check_13_cases(0, Dn);
+            break;
             
         #ifdef USE_START_STOP_UNIT
         case START_STOP_UNIT:
@@ -813,10 +785,16 @@ static uint8_t service_cbw(void)
             if(!check_for_media())
             {
                 media_not_present_sense();
-                return fail_command(Dn);
+                fail_command();
+                return;
             }
             #endif
-            return no_data_response(msd_start_stop_unit());
+            if(check_13_cases(0, Dn) && msd_start_stop_unit())
+            {
+                fail_command();
+                return;
+            }
+            break;
         #endif
             
             
@@ -825,42 +803,43 @@ static uint8_t service_cbw(void)
             if(!check_for_media())
             {
                 media_not_present_sense();
-                return fail_command(Di);
+                fail_command();
+                return;
             }
             #endif
             if((m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS != 0)&&(m_read_capacity_10_cmd.PMI == 0))
             {
-                // CHECK CONDITION status, ILLEGAL REQUEST sense key, INVALID FIELD IN CDB sense code
-                cause_bomsr();
-                return MSD_WAIT_ILLEGAL;
+                g_msd_sense_key                       = ILLEGAL_REQUEST;
+                g_msd_additional_sense_code           = ASC_INVALID_FIELD_IN_CBD;
+                g_msd_additional_sense_code_qualifier = ASCQ_INVALID_FIELD_IN_CBD;
+                fail_command();
+                return;
+            }
+            g_msd_rw_10_vars.START_LBA_BYTES[0] = m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS_BYTES[3];// Big-endian to little-endian
+            g_msd_rw_10_vars.START_LBA_BYTES[1] = m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS_BYTES[2];
+            g_msd_rw_10_vars.START_LBA_BYTES[2] = m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS_BYTES[1];
+            g_msd_rw_10_vars.START_LBA_BYTES[3] = m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS_BYTES[0];
+
+            g_msd_rw_10_vars.LBA = g_msd_rw_10_vars.START_LBA;
+
+            #ifdef USE_READ_CAPACITY
+            msd_read_capacity();
+            #else
+            if(g_msd_rw_10_vars.START_LBA > LAST_BLOCK_LE)
+            {
+                g_msd_read_capacity_10.RETURNED_LOGICAL_BLOCK_ADDRESS = 0xFFFFFFFFUL;
             }
             else
             {
-                g_msd_rw_10_vars.START_LBA_BYTES[0] = m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS_BYTES[3];// Big-endian to little-endian
-                g_msd_rw_10_vars.START_LBA_BYTES[1] = m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS_BYTES[2];
-                g_msd_rw_10_vars.START_LBA_BYTES[2] = m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS_BYTES[1];
-                g_msd_rw_10_vars.START_LBA_BYTES[3] = m_read_capacity_10_cmd.LOGICAL_BLOCK_ADDRESS_BYTES[0];
-                
-                g_msd_rw_10_vars.LBA = g_msd_rw_10_vars.START_LBA;
-                
-                #ifdef USE_READ_CAPACITY
-                msd_read_capacity();
-                #else
-                if(g_msd_rw_10_vars.START_LBA > LAST_BLOCK_LE)
-                {
-                    g_msd_read_capacity_10.RETURNED_LOGICAL_BLOCK_ADDRESS = 0xFFFFFFFFUL;
-                }
-                else
-                {
-                    g_msd_read_capacity_10.RETURNED_LOGICAL_BLOCK_ADDRESS = LAST_BLOCK_BE;
-                }
-                g_msd_read_capacity_10.BLOCK_LENGTH_IN_BYTES = BYTES_PER_BLOCK_BE;
-                #endif
-                #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-                usb_ram_copy((uint8_t*)&g_msd_read_capacity_10, in_ep_addr, 8);
-                #endif
-                return send_data_response(8);
+                g_msd_read_capacity_10.RETURNED_LOGICAL_BLOCK_ADDRESS = LAST_BLOCK_BE;
             }
+            g_msd_read_capacity_10.BLOCK_LENGTH_IN_BYTES = BYTES_PER_BLOCK_BE;
+            #endif
+            #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
+            usb_ram_copy((uint8_t*)&g_msd_read_capacity_10, in_ep_addr, 8);
+            #endif
+            send_data_response(8);
+            break;
             
         #ifdef USE_VERIFY_10
         case VERIFY_10:
@@ -868,19 +847,17 @@ static uint8_t service_cbw(void)
             if(!check_for_media())
             {
                 media_not_present_sense();
-                return fail_command(Dn);
+                fail_command();
+                return;
             }
             #endif
-            return no_data_response(COMMAND_PASSED);
+            check_13_cases(0, Dn);
+            break;
         #endif
         default:
             invalid_command_sense();
-            if(g_msd_cbw.dCBWDataTransferLength)
-            {
-                if(g_msd_cbw.Direction) return fail_command(Di);
-                else return fail_command(Do);
-            }
-            else return fail_command(Dn);
+            fail_command();
+            break;
     }
 }
 
@@ -898,7 +875,7 @@ static void setup_cbw(void)
 
 static void setup_csw(void)
 {
-    g_msd_csw.dCSWSignature = CSW_SIG;
+    g_msd_csw.BYTES[3] = 'S';
     #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
     if(MSD_EP_IN_LAST_PPB == ODD)
     {
@@ -918,237 +895,144 @@ static void setup_csw(void)
 }
 
 
-static void calc_residue(uint16_t case_result, uint32_t device_bytes)
+static bool check_13_cases(uint32_t device_bytes, uint8_t dev_expect)
 {
-    if(case_result & (CASE_1|CASE_7|CASE_13))
-    {
-        g_msd_csw.dCSWDataResidue = 0;
-    }
-    else if(case_result & (CASE_4|CASE_5|CASE_6|CASE_9|CASE_11|CASE_12))
-    {
-        g_msd_csw.dCSWDataResidue = g_msd_cbw.dCBWDataTransferLength - device_bytes;
-    }
-    else
-    {
-        g_msd_csw.dCSWDataResidue = g_msd_cbw.dCBWDataTransferLength;
-    }
-}
-
-
-static uint16_t check_13_cases(uint32_t device_bytes, uint8_t dev_expect)
-{
-    // Chapter 6.7 of MSC Spec 1.0
-    /* ------ CASE ACTIONS ------ */
-    // CASE_1: bCSWStatus = bCSWStatus = COMMAND_PASSED or COMMAND_FAILED, dCSWDataResidue = 0
-    // CASE_2 & CASE_3: bCSWStatus = PHASE_ERROR, or STALL
-    // CASE_4 & CASE_5: Send available data + fill data to make up full dCBWDataTransferLength,
-    //                  bCSWStatus = COMMAND_PASSED or COMMAND_FAILED,
-    //                  dCSWDataResidue = dCBWDataTransferLength - Relevant data sent
-    // CASE_6: Send data, bCSWStatus = COMMAND_PASSED or COMMAND_FAILED, dCSWDataResidue = 0
-    // CASE_7 & CASE_8: Send dCBWDataTransferLength zeros, bCSWStatus = PHASE_ERROR
-    // CASE_9: & CASE_11: Receive bytes that can be interpreted, then stall.
-    //                    bCSWStatus = COMMAND_PASSED or COMMAND_FAILED,
-    //                    dCSWDataResidue = dCBWDataTransferLength - Relevant data received
-    // CASE_12: Receive g_msd_cbw.dCBWDataTransferLength bytes,
-    //          bCSWStatus = COMMAND_PASSED or COMMAND_FAILED,
-    //          dCSWDataResidue = 0
-    // CASE_10 & CASE_13: stall, bCSWStatus = PHASE_ERROR
+// Chapter 6.7 of MSC BOT Spec 1.0
+// ------ CASE ACTIONS ------
+//CASE_1 (Hn = Dn):
+//    - bCSWStatus = COMMAND_PASSED.
+//    - dCSWDataResidue = 0.
+//    - setup_csw.
+//
+//CASE_2 (Hn < Di) | CASE_3 (Hn < Do):
+//    - bCSWStatus = PHASE_ERROR.
+//    - dCSWDataResidue is ignored by host.
+//    - stall_ep_in, once EP is cleared setup_csw.
+//
+//CASE_4 (Hi > Dn) | CASE_5 (Hi > Di):
+//    - bCSWStatus = COMMAND_PASSED.
+//    - Send available data.
+//    - dCSWDataResidue = dCBWDataTransferLength - data_sent.
+//    - stall_ep_in, once EP is cleared setup_csw.
+//
+//CASE_6 (Hi = Di):
+//    - bCSWStatus = COMMAND_PASSED.
+//    - Send all data.
+//    - dCSWDataResidue = 0.
+//    - setup_csw.
+//    
+//CASE_7 (Hi < Di) | CASE_8 (Hi <> Do):
+//    - bCSWStatus = PHASE_ERROR.
+//    - dCSWDataResidue is ignored by host.
+//    - stall_ep_in, once EP is cleared setup_csw.
+//    
+//CASE_9 (Ho > Dn) | CASE_11 (Ho > Do) | CASE_12 (Ho = Do):
+//    - bCSWStatus = COMMAND_PASSED.
+//    - Send/receive available data.
+//    - dCSWDataResidue = dCBWDataTransferLength - data_sent.
+//    - if CASE_9 or CASE_11 stall_ep_out.
+//    - setup_csw (if stalled, once cleared).
+//	
+//CASE_10 (Ho <> Di) | CASE_13 (Ho < Do):
+//    - bCSWStatus = PHASE_ERROR.
+//    - dCSWDataResidue is ignored by host.
+//    - stall_ep_out, once EP is cleared setup_csw.
     
-    
-    uint16_t case_result;
-    
-    switch(dev_expect)
+    if(dev_expect == Dn)
     {
-        case Dn:
-            if(g_msd_cbw.dCBWDataTransferLength == 0) case_result = CASE_1;
-            else if(g_msd_cbw.Direction == IN) case_result = CASE_4;
-            else case_result = CASE_9;
-            break;
-        case Di:
-            if(g_msd_cbw.dCBWDataTransferLength == 0) case_result = CASE_2;
-            else if(g_msd_cbw.Direction == IN)
-            {
-                if(g_msd_cbw.dCBWDataTransferLength == device_bytes)     case_result = CASE_6;
-                else if(g_msd_cbw.dCBWDataTransferLength > device_bytes) case_result = CASE_5;
-                else case_result = CASE_7;
-            }
-            else case_result = CASE_10;
-            break;
-        case Do:
-            if(g_msd_cbw.dCBWDataTransferLength == 0) case_result = CASE_3;
-            else if(g_msd_cbw.Direction == OUT)
-            {
-                if(g_msd_cbw.dCBWDataTransferLength == device_bytes)     case_result = CASE_12;
-                else if(g_msd_cbw.dCBWDataTransferLength > device_bytes) case_result = CASE_11;
-                else case_result = CASE_13;
-            }
-            else case_result = CASE_8;
-            break;
-    }  
-    return case_result;
+        if(g_msd_cbw.dCBWDataTransferLength == 0)
+        {
+            setup_csw();
+            goto command_passed;
+        }
+        else if(g_msd_cbw.Direction == IN) msd_stall_ep_in();
+        else                               msd_stall_ep_out();
+        m_msd_state = MSD_WAIT_CLEAR;
+        goto command_passed;
+    }
+    if(g_msd_cbw.Direction == IN && dev_expect == Do)   goto phase_error;
+    if(g_msd_cbw.Direction == OUT && dev_expect == Di)  goto phase_error;
+    if(device_bytes > g_msd_cbw.dCBWDataTransferLength) goto phase_error;
+    if(device_bytes < g_msd_cbw.dCBWDataTransferLength) m_end_data_short = true;
+    
+    command_passed:
+    g_msd_csw.bCSWStatus = COMMAND_PASSED;
+    return true;
+    
+    phase_error:
+    cause_bomsr();
+    g_msd_csw.bCSWStatus = PHASE_ERROR;
+    return false;
 }
 
 
 static bool cbw_valid(void)
 {
-    bool valid_sts = true;
     #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
     if(MSD_EP_OUT_LAST_PPB == ODD)
     {
-        if(g_usb_bd_table[MSD_BD_OUT_ODD].CNT != 31) valid_sts = false;
+        if(g_usb_bd_table[MSD_BD_OUT_ODD].CNT != 31) goto cbw_not_valid;
     }
     else
     {
-        if(g_usb_bd_table[MSD_BD_OUT_EVEN].CNT != 31) valid_sts = false;
+        if(g_usb_bd_table[MSD_BD_OUT_EVEN].CNT != 31) goto cbw_not_valid;
     }
     #else
-    if(g_usb_bd_table[MSD_BD_OUT].CNT != 31) valid_sts = false;
+    if(g_usb_bd_table[MSD_BD_OUT].CNT != 31) goto cbw_not_valid;
     #endif
-    if(g_msd_cbw.dCBWSignature != 0x43425355) valid_sts = false;
-    if(!valid_sts) m_wait_for_bomsr = true;
-    return valid_sts;
+    if(g_msd_cbw.dCBWSignature != CBW_SIG) goto cbw_not_valid;
+    return true;
+    
+    cbw_not_valid:
+    m_wait_for_bomsr = true;
+    cause_bomsr();
+    m_msd_state = MSD_WAIT_BOMSR;
+    return false;
 }
 
 
 static void cause_bomsr(void)
 {
+    msd_stall_ep_out();
+    msd_stall_ep_in();
+    m_msd_state = MSD_WAIT_CLEAR;
+}
+
+
+static void fail_command(void)
+{
+    if(g_msd_cbw.dCBWDataTransferLength == 0) // Hn
+    {
+        g_msd_csw.bCSWStatus = COMMAND_FAILED;
+        setup_csw();
+    }
+    else 
+    {
+        if(g_msd_cbw.Direction) msd_stall_ep_in();  // Hi
+        else                    msd_stall_ep_out(); // Ho
+        g_msd_csw.bCSWStatus = COMMAND_FAILED;
+        m_msd_state = MSD_WAIT_CLEAR;
+    }
+}
+
+
+static void send_data_response(uint8_t device_bytes)
+{
+    if(!check_13_cases((uint32_t)device_bytes, Di)) return;
+    
+    g_msd_csw.dCSWDataResidue -= device_bytes;
+    
     #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-    g_usb_ep_stat[MSD_EP][IN].Halt  = 1;
-    usb_stall_ep(&g_usb_bd_table[MSD_BD_IN_EVEN]);
-    usb_stall_ep(&g_usb_bd_table[MSD_BD_IN_ODD]);
-    g_usb_ep_stat[MSD_EP][OUT].Halt = 1;
-    usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT_EVEN]);
-    usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT_ODD]);
+    msd_arm_ep_in((uint8_t)MSD_BD_IN_EVEN + (MSD_EP_IN_LAST_PPB ^ 1), device_bytes);
     #else
-    g_usb_ep_stat[MSD_EP][IN].Halt  = 1;
-    usb_stall_ep(&g_usb_bd_table[MSD_BD_IN]);
-    g_usb_ep_stat[MSD_EP][OUT].Halt = 1;
-    usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT]);
+    msd_arm_ep_in(device_bytes);
     #endif
-}
-
-
-static void reset_sense(void)
-{
-    for(uint8_t i = 0; i < sizeof(g_msd_fixed_format_sense.BYTE); i++) g_msd_fixed_format_sense.BYTE[i] = 0;
-    g_msd_fixed_format_sense.RESPONSE_CODE           = CURRENT_FIXED;
-    g_msd_fixed_format_sense.ADDITIONAL_SENSE_LENGTH = 0x0A;
-//    g_msd_fixed_format_sense.RESPONSE_CODE           = CURRENT_FIXED;
-//    g_msd_fixed_format_sense.VALID                   = 0;
-//    g_msd_fixed_format_sense.Obsolete                = 0;
-//    g_msd_fixed_format_sense.SENSE_KEY               = NO_SENSE;
-//    g_msd_fixed_format_sense.RESERVED                = 0;
-//    g_msd_fixed_format_sense.ILI                     = 0;
-//    g_msd_fixed_format_sense.EOM                     = 0;
-//    g_msd_fixed_format_sense.FILEMARK                = 0;
-//    g_msd_fixed_format_sense.INFORMATION[0]          = 0;
-//    g_msd_fixed_format_sense.INFORMATION[1]          = 0;
-//    g_msd_fixed_format_sense.INFORMATION[2]          = 0;
-//    g_msd_fixed_format_sense.INFORMATION[3]          = 0;
-//    g_msd_fixed_format_sense.ADDITIONAL_SENSE_LENGTH = 0x0A;
-//    g_msd_fixed_format_sense.COMMAND_SPECIFIC_INFORMATION[0] = 0;
-//    g_msd_fixed_format_sense.COMMAND_SPECIFIC_INFORMATION[1] = 0;
-//    g_msd_fixed_format_sense.COMMAND_SPECIFIC_INFORMATION[2] = 0;
-//    g_msd_fixed_format_sense.COMMAND_SPECIFIC_INFORMATION[3] = 0;
-//    g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE   = 0;
-//    g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE_QUALIFIER = 0;
-//    g_msd_fixed_format_sense.FIELD_REPLACEABLE_UNIT_CODE     = 0;
-//    g_msd_fixed_format_sense.SENSE_KEY_SPECIFIC[0]   = 0;
-//    g_msd_fixed_format_sense.SENSE_KEY_SPECIFIC[1]   = 0;
-//    g_msd_fixed_format_sense.SENSE_KEY_SPECIFIC[2]   = 0;
-}
-
-
-static uint8_t fail_command(uint8_t dev_expect)
-{
-    uint8_t result;
-    if(g_msd_cbw.dCBWDataTransferLength != 0)
-    {
-        #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-        if(dev_expect == Di)
-        {
-            g_usb_ep_stat[MSD_EP][IN].Halt = 1;
-            usb_stall_ep(&g_usb_bd_table[MSD_BD_IN_EVEN]);
-            usb_stall_ep(&g_usb_bd_table[MSD_BD_IN_ODD]);
-        }
-        else
-        {
-            g_usb_ep_stat[MSD_EP][OUT].Halt = 1;
-            usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT_EVEN]);
-            usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT_ODD]);
-        }
-        #else
-        if(dev_expect == Di)
-        {
-            g_usb_ep_stat[MSD_EP][IN].Halt = 1;
-            usb_stall_ep(&g_usb_bd_table[MSD_BD_IN]);
-        }
-        else
-        {
-            g_usb_ep_stat[MSD_EP][OUT].Halt = 1;
-            usb_stall_ep(&g_usb_bd_table[MSD_BD_OUT]);
-        }
-        #endif
-        result = MSD_WAIT_ILLEGAL;
-    }
-    else result = MSD_NO_DATA_STAGE;
-    g_msd_csw.dCSWDataResidue = g_msd_cbw.dCBWDataTransferLength;
-    g_msd_csw.bCSWStatus = COMMAND_FAILED;
-    return result;
-}
-
-
-static uint8_t no_data_response(uint8_t status)
-{
-    uint16_t case_result = check_13_cases(0, Dn);
-    if(case_result == CASE_1)
-    {
-        g_msd_csw.dCSWDataResidue = 0;
-        g_msd_csw.bCSWStatus      = status;
-        return MSD_NO_DATA_STAGE;
-    }
-    calc_residue(case_result, 0);
-    cause_bomsr();
-    return MSD_WAIT_ILLEGAL;
-}
-
-
-static uint8_t send_data_response(uint32_t device_bytes)
-{
-    uint16_t case_result = check_13_cases(device_bytes, Di);
-    uint8_t return_val;
     
-    calc_residue(case_result, device_bytes);
-    if(case_result & (CASE_2 | CASE_5 | CASE_6 | CASE_7))
-    {
-        if(case_result & (CASE_5 | CASE_6 | CASE_7))
-        {
-            #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-            msd_arm_ep_in((uint8_t)MSD_BD_IN_EVEN + (MSD_EP_IN_LAST_PPB ^ 1), device_bytes);
-            #else
-            msd_arm_ep_in(device_bytes);
-            #endif
-            return_val = MSD_DATA_SENT;
-        }
-        else return_val = MSD_NO_DATA_STAGE;
-        
-        if(case_result & (CASE_5 | CASE_6)) g_msd_csw.bCSWStatus = COMMAND_PASSED;
-        else g_msd_csw.bCSWStatus = PHASE_ERROR;
-
-        if(case_result == CASE_5) m_end_data_in_short = true;
-        
-        return return_val;
-    }
-    else
-    {
-        cause_bomsr();
-        return MSD_WAIT_ILLEGAL;
-    }
-    
+    m_msd_state = MSD_DATA_SENT;
 }
 
 
-static bool service_read10(void)
+static void service_read10(void)
 {
     #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
     #ifndef MSD_LIMITED_RAM
@@ -1189,13 +1073,15 @@ static bool service_read10(void)
     
     msd_arm_ep_in(bdt_index, MSD_EP_SIZE);
     
-    g_msd_rw_10_vars.CBW_TF_LEN -= MSD_EP_SIZE;
-    if(g_msd_rw_10_vars.CBW_TF_LEN == 0)
+    g_msd_rw_10_vars.TF_LEN_IN_BYTES -= MSD_EP_SIZE;
+    g_msd_csw.dCSWDataResidue -= MSD_EP_SIZE;
+    
+    if(g_msd_rw_10_vars.TF_LEN_IN_BYTES == 0)
     {
         MSD_EP_IN_DATA_TOGGLE_VAL ^= 1;
-        return true;
+        m_msd_state = MSD_READ_FINISHED;
     }
-    else return false;
+    return;
     
     #else
     #ifdef MSD_LIMITED_RAM
@@ -1216,14 +1102,16 @@ static bool service_read10(void)
 
     msd_arm_ep_in(MSD_EP_SIZE);
 
-    g_msd_rw_10_vars.CBW_TF_LEN -= MSD_EP_SIZE;
-    if(g_msd_rw_10_vars.CBW_TF_LEN == 0) return true;
-    else return false;
+    g_msd_rw_10_vars.TF_LEN_IN_BYTES -= MSD_EP_SIZE;
+    g_msd_csw.dCSWDataResidue -= MSD_EP_SIZE;
+    
+    if(g_msd_rw_10_vars.TF_LEN_IN_BYTES == 0) m_msd_state = MSD_DATA_SENT;
+    return;
     #endif
 }
 
 
-static bool service_write10(void)
+static void service_write10(void)
 {
     #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
     #ifndef MSD_LIMITED_RAM
@@ -1247,17 +1135,23 @@ static bool service_write10(void)
         g_msd_byte_of_sect = 0;
     }
 
-    g_msd_rw_10_vars.CBW_TF_LEN -= MSD_EP_SIZE;
+    g_msd_rw_10_vars.TF_LEN_IN_BYTES -= MSD_EP_SIZE;
+    g_msd_csw.dCSWDataResidue -= MSD_EP_SIZE;
     
-    if(g_msd_rw_10_vars.CBW_TF_LEN)
+    if(g_msd_rw_10_vars.TF_LEN_IN_BYTES == 0)
     {
-        msd_arm_ep_out((uint8_t)MSD_BD_OUT_EVEN + MSD_EP_OUT_LAST_PPB);
-        return false;
+        MSD_EP_OUT_DATA_TOGGLE_VAL ^= 1;
+        if(m_end_data_short)
+        {
+            msd_stall_ep_out();
+            m_end_data_short = false;
+            m_msd_state = MSD_WAIT_CLEAR;
+        }
+        else setup_csw();
     }
     else
     {
-        MSD_EP_OUT_DATA_TOGGLE_VAL ^= 1;
-        return true;
+        msd_arm_ep_out((uint8_t)MSD_BD_OUT_EVEN + MSD_EP_OUT_LAST_PPB);
     }
     
     #else
@@ -1274,41 +1168,45 @@ static bool service_write10(void)
         g_msd_rw_10_vars.LBA++;
         g_msd_byte_of_sect = 0;
     }
-    g_msd_rw_10_vars.CBW_TF_LEN -= MSD_EP_SIZE;
-    if(g_msd_rw_10_vars.CBW_TF_LEN == 0) return true;
-    else
+    g_msd_rw_10_vars.TF_LEN_IN_BYTES -= MSD_EP_SIZE;
+    g_msd_csw.dCSWDataResidue -= MSD_EP_SIZE;
+    
+    if(g_msd_rw_10_vars.TF_LEN_IN_BYTES == 0)
     {
-        msd_arm_ep_out();
-        return false;
+        if(m_end_data_short)
+        {
+            msd_stall_ep_out();
+            m_end_data_short = false;
+            m_msd_state = MSD_WAIT_CLEAR;
+        }
+        else setup_csw();
     }
+    else msd_arm_ep_out();
     #endif
 }
 
 
 static void invalid_command_sense(void)
 {
-    reset_sense();
-    g_msd_fixed_format_sense.SENSE_KEY                       = ILLEGAL_REQUEST;
-    g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE           = ASC_INVALID_COMMAND_OPCODE;
-    g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE_QUALIFIER = ASCQ_INVALID_COMMAND_OPCODE;
+    g_msd_sense_key                       = ILLEGAL_REQUEST;
+    g_msd_additional_sense_code           = ASC_INVALID_COMMAND_OPCODE;
+    g_msd_additional_sense_code_qualifier = ASCQ_INVALID_COMMAND_OPCODE;
 }
 
 
 static void media_not_present_sense(void)
 {
-    reset_sense();
-    g_msd_fixed_format_sense.SENSE_KEY                       = NOT_READY;
-    g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE           = ASC_MEDIUM_NOT_PRESENT;
-    g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE_QUALIFIER = ASCQ_MEDIUM_NOT_PRESENT;
+    g_msd_sense_key                       = NOT_READY;
+    g_msd_additional_sense_code           = ASC_MEDIUM_NOT_PRESENT;
+    g_msd_additional_sense_code_qualifier = ASCQ_MEDIUM_NOT_PRESENT;
 }
 
 
 static void unit_attention_sense(void)
 {
-    reset_sense();
-    g_msd_fixed_format_sense.SENSE_KEY                       = UNIT_ATTENTION;
-    g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE           = ASC_NOT_READY_TO_READY_CHANGE;
-    g_msd_fixed_format_sense.ADDITIONAL_SENSE_CODE_QUALIFIER = ASCQ_MEDIUM_MAY_HAVE_CHANGED;
+    g_msd_sense_key                       = UNIT_ATTENTION;
+    g_msd_additional_sense_code           = ASC_NOT_READY_TO_READY_CHANGE;
+    g_msd_additional_sense_code_qualifier = ASCQ_MEDIUM_MAY_HAVE_CHANGED;
 }
 
 #ifdef USE_EXTERNAL_MEDIA

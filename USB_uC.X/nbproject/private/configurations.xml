@@ -4,7 +4,7 @@
   <defaultConf>0</defaultConf>
   <confs>
     <conf name="PIC16F1454" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>900A:=&lt;rev>0002:=&lt;man>Microchip Technology Inc.:=&lt;prod>PICkit 3:=&lt;sn>BUR152974071:=&lt;drv>x:=&lt;xpt>h:=end</platformToolSN>
+      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
       <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
@@ -58,7 +58,7 @@
       </runprofile>
     </conf>
     <conf name="PIC18F14K50" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>900A:=&lt;rev>0002:=&lt;man>Microchip Technology Inc.:=&lt;prod>PICkit 3:=&lt;sn>BUR152974071:=&lt;drv>x:=&lt;xpt>h:=end</platformToolSN>
+      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
       <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
@@ -94,7 +94,7 @@
       </runprofile>
     </conf>
     <conf name="PIC18F25K50" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>900A:=&lt;rev>0002:=&lt;man>Microchip Technology Inc.:=&lt;prod>PICkit 3:=&lt;sn>BUR152974071:=&lt;drv>x:=&lt;xpt>h:=end</platformToolSN>
+      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
       <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
@@ -112,7 +112,7 @@
       </runprofile>
     </conf>
     <conf name="PIC18F45K50" type="2">
-      <platformToolSN>noToolString</platformToolSN>
+      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
       <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
@@ -166,7 +166,7 @@
       </runprofile>
     </conf>
     <conf name="PIC18F27J53" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>900A:=&lt;rev>0002:=&lt;man>Microchip Technology Inc.:=&lt;prod>PICkit 3:=&lt;sn>BUR152974071:=&lt;drv>x:=&lt;xpt>h:=end</platformToolSN>
+      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
       <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
@@ -184,7 +184,7 @@
       </runprofile>
     </conf>
     <conf name="PIC18F47J53" type="2">
-      <platformToolSN>noToolString</platformToolSN>
+      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>900A:=&lt;rev>0002:=&lt;man>Microchip Technology Inc.:=&lt;prod>PICkit 3:=&lt;sn>BUR152974071:=&lt;drv>x:=&lt;xpt>h:=end</platformToolSN>
       <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>

@@ -6,13 +6,17 @@
 #if defined(_PIC14E)
 // CONFIG1
 #if (XTAL_USED == NO_XTAL)
-    #pragma config FOSC = INTOSC    // Oscillator Selection Bits (INTOSC oscillator: I/O function on CLKIN pin)
+#pragma config FOSC = INTOSC
 #else
-    #pragma config FOSC = HS        // Oscillator Selection Bits (HS Oscillator, High-speed crystal/resonator connected between OSC1 and OSC2 pins)
+#pragma config FOSC = HS
 #endif
 #pragma config WDTE = SWDTEN    // Watchdog Timer Enable (WDT controlled by the SWDTEN bit in the WDTCON register)
 #pragma config PWRTE = ON       // Power-up Timer Enable (PWRT enabled)
-#pragma config MCLRE = ON       // MCLR Pin Function Select (MCLR/VPP pin function is MCLR)
+#ifdef USE_MCLRE
+#pragma config MCLRE = ON
+#else
+#pragma config MCLRE = OFF
+#endif
 #pragma config CP = OFF         // Flash Program Memory Code Protection (Program memory code protection is disabled)
 #pragma config BOREN = SBODEN   // Brown-out Reset Enable (Brown-out Reset controlled by the SBOREN bit in the BORCON register)
 #pragma config CLKOUTEN = OFF   // Clock Out Enable (CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin)
@@ -28,7 +32,11 @@
 #pragma config STVREN = ON      // Stack Overflow/Underflow Reset Enable (Stack Overflow or Underflow will cause a Reset)
 #pragma config BORV = HI        // Brown-out Reset Voltage Selection (Brown-out Reset Voltage (Vbor), high trip point selected.)
 #pragma config LPBOR = OFF      // Low-Power Brown Out Reset (Low-Power BOR is disabled)
-#pragma config LVP = ON         // Low-Voltage Programming Enable (Low-voltage programming enabled)
+#ifdef USE_LVP
+#pragma config LVP = ON
+#else
+#pragma config LVP = OFF
+#endif
 
 
 #elif defined(_18F14K50)
@@ -54,11 +62,19 @@
 
 // CONFIG3H
 #pragma config HFOFST = OFF     // HFINTOSC Fast Start-up bit (The system clock is held off until the HFINTOSC is stable.)
-#pragma config MCLRE = ON       // MCLR Pin Enable bit (MCLR pin enabled; RA3 input pin disabled)
+#ifdef USE_MCLRE
+#pragma config MCLRE = ON
+#else
+#pragma config MCLRE = OFF
+#endif
 
 // CONFIG4L
 #pragma config STVREN = ON      // Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
-#pragma config LVP = OFF        // Single-Supply ICSP Enable bit (Single-Supply ICSP disabled)
+#ifdef USE_LVP
+#pragma config LVP = ON
+#else
+#pragma config LVP = OFF
+#endif
 #pragma config BBSIZ = OFF      // Boot Block Size Select bit (1kW boot block size)
 #pragma config XINST = OFF      // Extended Instruction Set Enable bit (Instruction set extension and Indexed Addressing mode disabled (Legacy mode))
 
@@ -95,10 +111,10 @@
 #pragma config LS48MHZ = SYS48X8// Low Speed USB mode with 48 MHz system clock (System clock at 48 MHz, USB clock divider is set to 8)
 
 // CONFIG1H
-#if XTAL_USED == NO_XTAL
-    #pragma config FOSC = INTOSCIO  // Oscillator Selection (Internal oscillator)
+#if (XTAL_USED == NO_XTAL)
+#pragma config FOSC = INTOSCIO
 #else
-    #pragma config FOSC = HSH       // Oscillator Selection (HS oscillator, high power 16MHz to 25MHz)
+#pragma config FOSC = HSH
 #endif
 #pragma config PCLKEN = OFF     // Primary Oscillator Shutdown (Primary oscillator shutdown firmware controlled)
 #pragma config FCMEN = OFF      // Fail-Safe Clock Monitor (Fail-Safe Clock Monitor disabled)
@@ -119,11 +135,19 @@
 #pragma config PBADEN = OFF     // PORTB A/D Enable bit (PORTB<5:0> pins are configured as digital I/O on Reset)
 #pragma config T3CMX = RC0      // Timer3 Clock Input MUX bit (T3CKI function is on RC0)
 #pragma config SDOMX = RB3      // SDO Output MUX bit (SDO function is on RB3)
-#pragma config MCLRE = ON       // Master Clear Reset Pin Enable (MCLR pin enabled; RE3 input disabled)
+#ifdef USE_MCLRE
+#pragma config MCLRE = ON
+#else
+#pragma config MCLRE = OFF
+#endif
 
 // CONFIG4L
 #pragma config STVREN = ON      // Stack Full/Underflow Reset (Stack full/underflow will cause Reset)
-#pragma config LVP = ON         // Single-Supply ICSP Enable bit (Single-Supply ICSP enabled if MCLRE is also 1)
+#ifdef USE_LVP
+#pragma config LVP = ON
+#else
+#pragma config LVP = OFF
+#endif
 #pragma config ICPRT = OFF      // Dedicated In-Circuit Debug/Programming Port Enable (ICPORT disabled)
 #pragma config XINST = OFF      // Extended Instruction Set Enable bit (Instruction set extension and Indexed Addressing mode disabled)
 

@@ -36,6 +36,9 @@
 #define ASC_INVALID_COMMAND_OPCODE                       0x20
 #define ASCQ_INVALID_COMMAND_OPCODE                      0x00
 
+#define ASC_INVALID_FIELD_IN_CBD                         0x24
+#define ASCQ_INVALID_FIELD_IN_CBD                        0x00
+
 #define ASC_LOGICAL_UNIT_NOT_SUPPORTED                   0x25
 #define ASCQ_LOGICAL_UNIT_NOT_SUPPORTED                  0x00
 

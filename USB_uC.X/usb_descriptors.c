@@ -3,7 +3,7 @@
  * @brief Contains core USB stack descriptors stored in ROM.
  * @author John Izzard
  * @date 28/06/2020
- * 
+ *
  * USB uC - USB MSD Bootloader.
  * Copyright (C) 2017-2020  John Izzard
  *
@@ -26,7 +26,7 @@
 #include "usb_ch9.h"
 
 #define DEV_DESC_PID 0xEB78
-#define REL_NUM      0x0100
+#define REL_NUM      0x0110
 
 #if defined(_PIC14E)
 
@@ -97,7 +97,7 @@ static const config_descriptor_t config_descriptor0 =
 
     // Interface Descriptor
     {
-        9,              // bLength:8 - Size of interface descriptor in bytes           
+        9,              // bLength:8 - Size of interface descriptor in bytes
         INTERFACE_DESC, // bDescriptorType:8 - Interface descriptor type
         0x00,           // bInterfaceNumber:8 - Index number of interface
         0x00,           // bAlternateSetting:8 - Value used to select alternate setting

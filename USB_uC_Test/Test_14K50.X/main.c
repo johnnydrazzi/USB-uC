@@ -1,18 +1,75 @@
-/*
- * File:   main.c
- * Author: e5105180
- *
- * Created on 1 March 2018, 5:31 PM
- */
 
 #include <xc.h>
 
-#define _XTAL_FREQ 12000000
+#define DM164127 0 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2.
+#define GENERAL  1 // Compatible with dev boards that have a reset button.
+#define DEV_BRD  2 // A custom dev board I use.
+#define CUSTOM   3 // Write your own.
+#define BOARD_VERSION DM164127
 
-#define LED      LATCbits.LATC1
-#define LED_TRIS TRISCbits.TRISC1
+#if BOARD_VERSION == DM164127 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2
+                              // and MonkeyBUS - PIC18F14K50.
+#define BUTTON_PORT_BIT   3
+#define BUTTON_PORT       PORTA
+#define BUTTON_WPU_BIT    3
+#define BUTTON_WPU        WPUA
+#define BUTTON_ACTIVE_LOW
+#define LED_BIT           0
+#define LED_LAT           LATC
+#define LED_TRIS          TRISC
 
-#define BUTTON PORTCbits.RC0
+#elif BOARD_VERSION == GENERAL
+#define BUTTON_PORT_BIT   3
+#define BUTTON_PORT       PORTA
+#define BUTTON_WPU_BIT    3
+#define BUTTON_WPU        WPUA
+#define BUTTON_ACTIVE_LOW
+#define LED_BIT
+#define LED_LAT
+#define LED_TRIS
+
+#elif BOARD_VERSION == DEV_BRD
+#define BUTTON_PORT_BIT   0
+#define BUTTON_PORT       PORTC
+#define BUTTON_ANSEL_BIT  4
+#define BUTTON_ANSEL      ANSEL
+#define BUTTON_ACTIVE_LOW
+#define LED_BIT           1
+#define LED_LAT           LATC
+#define LED_TRIS          TRISC
+
+#elif BOARD_VERSION == CUSTOM
+#define BUTTON_PORT_BIT     // Button's bit in the I/O PORT.
+#define BUTTON_PORT         // Button's I/O PORT.
+//#define BUTTON_ANSEL_BIT  // Uncomment and define the Button's pin to make digital (if needed).
+//#define BUTTON_ANSEL      // Uncomment and define the ANSEL register.
+//#define BUTTON_WPU_BIT    // Uncomment and define the Button's Weak Pull-Up pin (if needed).
+//#define BUTTON_WPU        // Uncomment and define the WPU register.
+#define BUTTON_ACTIVE_LOW   // Uncomment to make the Button active low.
+#define LED_BIT             // LED's bit in the LAT register.
+#define LED_LAT             // LED's LAT register.
+#define LED_TRIS            // LED's TRIS register.
+//#define LED_ACTIVE_LOW    // Uncomment to make the LED active low.
+#endif
+
+#define _XTAL_FREQ          48000000
+#define PLL_STARTUP_DELAY() __delay_ms(3)
+
+#ifndef BUTTON_ACTIVE_LOW
+    #define BUTTON_PRESSED (BUTTON_PORT & (1 << BUTTON_PORT_BIT))
+#else
+    #define BUTTON_PRESSED !(BUTTON_PORT & (1 << BUTTON_PORT_BIT))
+#endif
+        
+#ifndef LED_ACTIVE_LOW
+    #define LED_ON()  LED_LAT |= (1 << LED_BIT)
+    #define LED_OFF() LED_LAT &= ~(1 << LED_BIT)
+#else
+    #define LED_ON()  LED_LAT &= ~(1 << LED_BIT)
+    #define LED_OFF() LED_LAT |= (1 << LED_BIT)
+#endif
+
+#define LED_OUPUT() LED_TRIS &= ~(1 << LED_BIT)
 
 //__EEPROM_DATA(0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07);
 //__EEPROM_DATA(0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F);
@@ -47,27 +104,49 @@
 //__EEPROM_DATA(0xF0,0xF1,0xF2,0xF3,0xF4,0xF5,0xF6,0xF7);
 //__EEPROM_DATA(0xF8,0xF9,0xFA,0xFB,0xFC,0xFD,0xFE,0xFF);
 
+static void inline init(void);
+
 void main(void)
 {
-    ANSEL = 0;
-    LED = 0;
-    LED_TRIS = 0;
+    init();
+    LED_OUPUT();
+    LED_OFF();
+
     while(1)
     {
-        if(BUTTON)
+        if(BUTTON_PRESSED)
         {
-            LED = 1;
+            LED_ON();
             __delay_ms(250);
-            LED = 0;
+            LED_OFF();
             __delay_ms(250);
         }
         else
         {
-            LED = 1;
+            LED_ON();
             __delay_ms(500);
-            LED = 0;
+            LED_OFF();
             __delay_ms(500);
         }
     }
     return;
+}
+
+static void inline init(void)
+{
+    OSCTUNEbits.SPLLEN = 1;
+    PLL_STARTUP_DELAY();
+    
+    // Make boot pin digital.
+    #ifdef BUTTON_ANSEL
+    BUTTON_ANSEL &= ~(1<<BUTTON_ANSEL_BIT);
+    #endif
+
+    // Apply pull-up.
+    #ifdef BUTTON_WPU
+    WPUA = 0;
+    WPUB = 0;
+    BUTTON_WPU |= (1 << BUTTON_WPU_BIT);
+    INTCON2bits.nRABPU = 0;
+    #endif
 }

@@ -2,10 +2,10 @@
  * @file usb_msd.h
  * @brief <i>Mass Storage Class</i> core header.
  * @author John Izzard
- * @date 05/06/2020
+ * @date 21/04/2021
  * 
  * USB uC - MSD Library.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2021  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,11 +31,11 @@
 #include "usb_scsi.h"
 
 /* ************************************************************************** */
-/* ************************** PIC14 WARNING ********************************* */
+/* ************************** PIC16 WARNING ********************************* */
 /* ************************************************************************** */
 
 #ifdef _PIC14E
-#warning "MSD EP Buffer addresses need to be manually set for PIC16 devices."
+#warning "MSD EP Buffer addresses have been manually set for PIC16 devices."
 #endif
 
 /* ************************************************************************** */
@@ -137,8 +137,8 @@ extern uint8_t MSD_EP_IN_ODD[MSD_EP_SIZE]      __at(MSD_EP_IN_ODD_BUFFER_BASE_AD
 /* ************************************************************************** */
 
 // dCBWSignature/dCSWSignature values
-#define CBW_SIG 0x43425355
-#define CSW_SIG 0x53425355
+#define CBW_SIG 0x43425355 // "USBC"
+#define CSW_SIG 0x53425355 // "USBS"
 
 /* ************************************************************************** */
 
@@ -149,14 +149,13 @@ extern uint8_t MSD_EP_IN_ODD[MSD_EP_SIZE]      __at(MSD_EP_IN_ODD_BUFFER_BASE_AD
 
 // MSD STATES
 #define MSD_CBW           0
-#define MSD_NO_DATA_STAGE 1
-#define MSD_DATA_SENT     2
-#define MSD_CSW           3
-#define MSD_READ_DATA     4
+#define MSD_DATA_SENT     1
+#define MSD_CSW           2
+#define MSD_READ_DATA     3
+#define MSD_READ_FINISHED 4
 #define MSD_WRITE_DATA    5
-#define MSD_WAIT_ILLEGAL  6
-#define MSD_WAIT_IVALID   7
-#define MSD_READ_FINISHED 8
+#define MSD_WAIT_CLEAR    6
+#define MSD_WAIT_BOMSR    7
 
 /* ************************************************************************** */
 
@@ -264,7 +263,6 @@ typedef struct
         uint16_t TF_LEN;
     };
     uint32_t TF_LEN_IN_BYTES;
-    uint32_t CBW_TF_LEN;
 }msd_rw_10_vars_t;
 
 /** Stores the amount of bytes to be return in responses. */
@@ -416,7 +414,6 @@ void msd_arm_ep_in(uint8_t bdt_index, uint16_t cnt);
  * 
  * The function is used to arm MSD EP OUT for a transaction.
  * 
- * 
  * <b>Code Example:</b>
  * <ul style="list-style-type:none"><li>
  * @code
@@ -444,6 +441,38 @@ void msd_arm_ep_out(void);
  */
 void msd_arm_ep_in(uint16_t cnt);
 #endif
+
+/**
+ * @fn void msd_stall_ep_out(void)
+ * 
+ * @brief Stalls MSD EP OUT Endpoint.
+ * 
+ * The function is used to stall MSD EP OUT.
+ * 
+ * <b>Code Example:</b>
+ * <ul style="list-style-type:none"><li>
+ * @code
+ * msd_stall_ep_out();
+ * @endcode
+ * </li></ul>
+ */
+void msd_stall_ep_out(void);
+
+/**
+ * @fn void msd_stall_ep_in(void)
+ * 
+ * @brief Stalls MSD EP IN Endpoint.
+ * 
+ * The function is used to stall MSD EP IN.
+ * 
+ * <b>Code Example:</b>
+ * <ul style="list-style-type:none"><li>
+ * @code
+ * msd_stall_ep_in();
+ * @endcode
+ * </li></ul>
+ */
+void msd_stall_ep_in(void);
 
 // TODO: descriptions for these
 // USER FUNCTIONS TO PLACE IN MAIN

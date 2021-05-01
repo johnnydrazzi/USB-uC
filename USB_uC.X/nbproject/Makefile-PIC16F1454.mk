@@ -94,7 +94,7 @@ MP_PROCESSOR_OPTION=16F1454
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/bootloader.p1: bootloader.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/bootloader.p1: bootloader.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/bootloader.p1.d 
 	@${RM} ${OBJECTDIR}/bootloader.p1 
@@ -102,7 +102,7 @@ ${OBJECTDIR}/bootloader.p1: bootloader.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/bootloader.d ${OBJECTDIR}/bootloader.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/bootloader.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.p1.d 
 	@${RM} ${OBJECTDIR}/main.p1 
@@ -110,7 +110,7 @@ ${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/main.d ${OBJECTDIR}/main.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/main.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/EEPROM.p1: EEPROM.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/EEPROM.p1: EEPROM.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/EEPROM.p1.d 
 	@${RM} ${OBJECTDIR}/EEPROM.p1 
@@ -118,7 +118,7 @@ ${OBJECTDIR}/EEPROM.p1: EEPROM.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/EEPROM.d ${OBJECTDIR}/EEPROM.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/EEPROM.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/flash.p1: flash.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/flash.p1: flash.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/flash.p1.d 
 	@${RM} ${OBJECTDIR}/flash.p1 
@@ -126,7 +126,7 @@ ${OBJECTDIR}/flash.p1: flash.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/flash.d ${OBJECTDIR}/flash.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/flash.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb.p1: usb.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb.p1: usb.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb.p1.d 
 	@${RM} ${OBJECTDIR}/usb.p1 
@@ -134,7 +134,7 @@ ${OBJECTDIR}/usb.p1: usb.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/usb.d ${OBJECTDIR}/usb.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/usb.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb_app.p1: usb_app.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb_app.p1: usb_app.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb_app.p1.d 
 	@${RM} ${OBJECTDIR}/usb_app.p1 
@@ -142,7 +142,7 @@ ${OBJECTDIR}/usb_app.p1: usb_app.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/usb_app.d ${OBJECTDIR}/usb_app.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/usb_app.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb_descriptors.p1: usb_descriptors.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb_descriptors.p1: usb_descriptors.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb_descriptors.p1.d 
 	@${RM} ${OBJECTDIR}/usb_descriptors.p1 
@@ -150,7 +150,7 @@ ${OBJECTDIR}/usb_descriptors.p1: usb_descriptors.c  nbproject/Makefile-${CND_CON
 	@-${MV} ${OBJECTDIR}/usb_descriptors.d ${OBJECTDIR}/usb_descriptors.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/usb_descriptors.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb_msd.p1: usb_msd.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb_msd.p1: usb_msd.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb_msd.p1.d 
 	@${RM} ${OBJECTDIR}/usb_msd.p1 
@@ -158,7 +158,7 @@ ${OBJECTDIR}/usb_msd.p1: usb_msd.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/usb_msd.d ${OBJECTDIR}/usb_msd.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/usb_msd.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb_scsi_inq.p1: usb_scsi_inq.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb_scsi_inq.p1: usb_scsi_inq.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb_scsi_inq.p1.d 
 	@${RM} ${OBJECTDIR}/usb_scsi_inq.p1 
@@ -167,7 +167,7 @@ ${OBJECTDIR}/usb_scsi_inq.p1: usb_scsi_inq.c  nbproject/Makefile-${CND_CONF}.mk
 	@${FIXDEPS} ${OBJECTDIR}/usb_scsi_inq.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
 else
-${OBJECTDIR}/bootloader.p1: bootloader.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/bootloader.p1: bootloader.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/bootloader.p1.d 
 	@${RM} ${OBJECTDIR}/bootloader.p1 
@@ -175,7 +175,7 @@ ${OBJECTDIR}/bootloader.p1: bootloader.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/bootloader.d ${OBJECTDIR}/bootloader.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/bootloader.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.p1.d 
 	@${RM} ${OBJECTDIR}/main.p1 
@@ -183,7 +183,7 @@ ${OBJECTDIR}/main.p1: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/main.d ${OBJECTDIR}/main.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/main.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/EEPROM.p1: EEPROM.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/EEPROM.p1: EEPROM.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/EEPROM.p1.d 
 	@${RM} ${OBJECTDIR}/EEPROM.p1 
@@ -191,7 +191,7 @@ ${OBJECTDIR}/EEPROM.p1: EEPROM.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/EEPROM.d ${OBJECTDIR}/EEPROM.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/EEPROM.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/flash.p1: flash.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/flash.p1: flash.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/flash.p1.d 
 	@${RM} ${OBJECTDIR}/flash.p1 
@@ -199,7 +199,7 @@ ${OBJECTDIR}/flash.p1: flash.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/flash.d ${OBJECTDIR}/flash.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/flash.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb.p1: usb.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb.p1: usb.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb.p1.d 
 	@${RM} ${OBJECTDIR}/usb.p1 
@@ -207,7 +207,7 @@ ${OBJECTDIR}/usb.p1: usb.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/usb.d ${OBJECTDIR}/usb.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/usb.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb_app.p1: usb_app.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb_app.p1: usb_app.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb_app.p1.d 
 	@${RM} ${OBJECTDIR}/usb_app.p1 
@@ -215,7 +215,7 @@ ${OBJECTDIR}/usb_app.p1: usb_app.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/usb_app.d ${OBJECTDIR}/usb_app.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/usb_app.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb_descriptors.p1: usb_descriptors.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb_descriptors.p1: usb_descriptors.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb_descriptors.p1.d 
 	@${RM} ${OBJECTDIR}/usb_descriptors.p1 
@@ -223,7 +223,7 @@ ${OBJECTDIR}/usb_descriptors.p1: usb_descriptors.c  nbproject/Makefile-${CND_CON
 	@-${MV} ${OBJECTDIR}/usb_descriptors.d ${OBJECTDIR}/usb_descriptors.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/usb_descriptors.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb_msd.p1: usb_msd.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb_msd.p1: usb_msd.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb_msd.p1.d 
 	@${RM} ${OBJECTDIR}/usb_msd.p1 
@@ -231,7 +231,7 @@ ${OBJECTDIR}/usb_msd.p1: usb_msd.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/usb_msd.d ${OBJECTDIR}/usb_msd.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/usb_msd.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
-${OBJECTDIR}/usb_scsi_inq.p1: usb_scsi_inq.c  nbproject/Makefile-${CND_CONF}.mk
+${OBJECTDIR}/usb_scsi_inq.p1: usb_scsi_inq.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usb_scsi_inq.p1.d 
 	@${RM} ${OBJECTDIR}/usb_scsi_inq.p1 

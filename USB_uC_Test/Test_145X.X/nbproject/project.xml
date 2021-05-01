@@ -15,7 +15,15 @@
             <sourceRootList/>
             <confList>
                 <confElem>
-                    <name>default</name>
+                    <name>PIC16F1454</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC16F1455</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC16F1459</name>
                     <type>2</type>
                 </confElem>
             </confList>

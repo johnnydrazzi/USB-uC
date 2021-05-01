@@ -3,7 +3,7 @@
  * @brief Contains SCSI's Inquiry Command Response.
  * @author John Izzard
  * @date 05/06/2020
- * 
+ *
  * USB uC - MSD Library.
  * Copyright (C) 2017-2020  John Izzard
  *
@@ -24,7 +24,7 @@
 
 // String Settings
 #define SCSI_VENDER_ID   {'M','i','c','r','o','c','h','p'}
-#define SCSI_PRODUCT_REV {'0','1','0','0'}
+#define SCSI_PRODUCT_REV {'0','1','1','0'}
 
 #if defined(_PIC14E)
 #define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','1','4','5','X',' ',' ',' ',' ',' '}

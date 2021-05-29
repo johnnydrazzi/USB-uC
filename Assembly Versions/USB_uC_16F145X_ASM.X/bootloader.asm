@@ -498,6 +498,8 @@ _tx_data_sect:
     clrf        prev_row_index
     ; Set flash row to all 0xFF.
     call        reset_row
+    ; Clear ULBA in preparation.
+    clrf        ULBA
     ; hex_state = HEX_START.
     movlw       (1<<HEX_START)
     movwf       hex_state
@@ -618,7 +620,6 @@ _HEX_START:
     movlw       2           ; rec_len is derived from two characters.
     movwf       char_cnt
     clrf        rec_len     ; Clear rec_len in preparation.
-    clrf        ULBA        ; Clear ULBA in preparation.
     ; hex_state = HEX_REC_LEN.
     movlw       (1<<HEX_REC_LEN)
     movwf       hex_state

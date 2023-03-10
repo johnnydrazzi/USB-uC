@@ -1,4 +1,6 @@
 .DS_Store
+.mk
 build/
 debug/
 dist/
+.ca/

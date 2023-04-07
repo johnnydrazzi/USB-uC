@@ -2,10 +2,10 @@
  * @file main.c
  * @brief Main C file.
  * @author John Izzard
- * @date 17/06/2020
+ * @date 10/03/2023
  * 
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * Project Version: v1.11
+ * MPLABX: v6.05
+ * XC8: v2.41
+ * Device Packages Used:
+ *      - PIC12-16F1xxx_DFP v1.3.90
+ *      - PIC18Fxxxx_DFP v1.3.36
+ *      - PIC18F-K_DFP v1.8.249
+ *      - PIC18F-J_DFP v1.5.44
  */
 
 #include <xc.h>
@@ -126,6 +135,10 @@ static void inline boot_init(void)
     ACTCONbits.ACTEN = 1;
     #endif
 
+    // PIC18FX450, PIC18FX550, and PIC18FX455.
+    #elif defined(_18F4450_FAMILY_) || defined(_18F4550_FAMILY_)
+    PLL_STARTUP_DELAY();
+    
     // PIC18F14K50.
     #elif defined(_18F14K50)
     OSCTUNEbits.SPLLEN = 1;
@@ -160,7 +173,7 @@ static void inline boot_init(void)
     BUTTON_ANCON |= (1<<BUTTON_ANCON_BIT);
     #endif
 
-    
+
     // Apply pull-up.
     #ifdef BUTTON_WPU
     #if defined(_PIC14E)
@@ -170,6 +183,16 @@ static void inline boot_init(void)
     #endif
     BUTTON_WPU |= (1 << BUTTON_WPU_BIT);
     OPTION_REGbits.nWPUEN = 0;
+    
+    #elif defined(_18F4450_FAMILY_) || defined(_18F4550_FAMILY_)
+    LATB = 0;
+    LATD = 0;
+    BUTTON_WPU |= (1 << BUTTON_WPU_BIT);
+    #if BUTTON_RXPU_REG == INTCON2
+    INTCON2 &= 7F;
+    #else
+    PORTE |= 80;
+    #endif
     
     #elif defined(_18F14K50)
     WPUA = 0;
@@ -183,12 +206,12 @@ static void inline boot_init(void)
     BUTTON_WPU |= (1 << BUTTON_WPU_BIT);
     INTCON2bits.nRBPU = 0;
     
-    #elif defined(_18F26J53) || defined(_18F27J53)
+    #elif defined(_18F24J50) || defined(_18F25J50) || defined(_18F26J50) || defined(_18F26J53) || defined(_18F27J53)
     LATB = 0;
     BUTTON_WPU |= (1 << BUTTON_WPU_BIT);
     BUTTON_RXPU_REG &= ~(1 << BUTTON_RXPU_BIT);
     
-    #elif defined(_18F46J53) || defined(_18F47J53)
+    #elif defined(_18F44J50) || defined(_18F45J50) || defined(_18F46J50) || defined(_18F46J53) || defined(_18F47J53)
     LATB = 0;
     LATD = 0;
     LATE = 0;
@@ -209,6 +232,15 @@ static void inline boot_uninit(void)
     WPUB = 0xFF;
     #endif
 
+    #elif defined(_18F4450_FAMILY_) || defined(_18F4550_FAMILY_)
+    #if BUTTON_RXPU_REG == INTCON2
+    INTCON2 |= 80;
+    #else
+    PORTE &= 7F;
+    #endif
+    LATB = 0xFF;
+    LATD = 0xFF;
+
     #elif defined(_18F14K50)
     INTCON2 = 0xFF;
     WPUA = 0xFF;
@@ -219,11 +251,11 @@ static void inline boot_uninit(void)
     WPUB = 0xFF;
     TRISE = 0xFF;
     
-    #elif defined(_18F26J53) || defined(_18F27J53)
+    #elif defined(_18F24J50) || defined(_18F25J50) || defined(_18F26J50) || defined(_18F26J53) || defined(_18F27J53)
     BUTTON_RXPU_REG |= (1 << BUTTON_RXPU_BIT);
     LATB = 0xFF;
     
-    #elif defined(_18F46J53) || defined(_18F47J53)
+    #elif defined(_18F44J50) || defined(_18F45J50) || defined(_18F46J50) || defined(_18F46J53) || defined(_18F47J53)
     BUTTON_RXPU_REG |= (1 << BUTTON_RXPU_BIT);
     LATB = 0xFF;
     LATD = 0xFF;

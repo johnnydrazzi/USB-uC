@@ -2,10 +2,10 @@
  * @file config.h
  * @brief PIC Microcontroller Settings.
  * @author John Izzard
- * @date 18/06/2020
+ * @date 10/03/2023
  * 
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 #define MHz_12  1
 #define MHz_16  2
 
-#elif defined(__J_PART)
+#elif defined(__J_PART) || defined(_18F4450_FAMILY_) || defined(_18F4550_FAMILY_)
 #define MHz_4  1
 #define MHz_8  2
 #define MHz_12 3
@@ -53,7 +53,7 @@
 #define GENERAL  1 // Compatible with dev boards that have a reset button.
 #define XPRESS   2 // Compatible with the programmer (PIC16F1454) on DM164141 (used it for development).
 #define CUSTOM   3 // Write your own.
-#define BOARD_VERSION DM164127
+#define BOARD_VERSION GENERAL
 
 #if BOARD_VERSION == DM164127
 #define XTAL_USED         NO_XTAL // Could also use MHz_12.
@@ -105,13 +105,84 @@
 //#define LED_ACTIVE_LOW    // Uncomment to make the Bootloader LED active low.
 #endif
 
+// PIC18Fx450 Settings:
+#elif defined(_18F4450_FAMILY_)
+#define GENERAL    0 // Compatible with dev boards that have a reset button.
+#define CUSTOM     1 // Write your own.
+#define BOARD_VERSION GENERAL
+
+#if BOARD_VERSION == GENERAL
+#define XTAL_USED         MHz_8
+#define BUTTON_PORT_BIT   3
+#define BUTTON_PORT       PORTE
+#define BUTTON_ACTIVE_LOW
+
+#elif BOARD_VERSION == CUSTOM
+#define XTAL_USED           // Select oscillator option.
+#define USE_MCLRE           // Uncomment to enable MCLRE (reset pin).
+#define USE_LVP             // Uncomment if LVP (Low Voltage Programming) is needed.
+#define BUTTON_PORT_BIT     // Bootloader Button's bit in the I/O PORT.
+#define BUTTON_PORT         // Bootloader Button's I/O PORT.
+//#define BUTTON_WPU_BIT    // Uncomment and define the Bootloader Button's Weak Pull-Up pin (if needed).
+//#define BUTTON_WPU        // Uncomment and define the WPU register.
+//#define BUTTON_RXPU_BIT   // Uncomment and define the bit that enables the Weak Pull-Up pin.
+//#define BUTTON_RXPU_REG   // Uncomment and define which register has the RXPU bit to enable the Weak Pull-Up pin.
+#define BUTTON_ACTIVE_LOW   // Uncomment to make the Bootloader Button active low.
+#define USE_BOOT_LED        // Uncomment if you wish to have a Bootloader LED.
+#define LED_BIT             // Bootloader LED's bit in the LAT register.
+#define LED_LAT             // Bootloader LED's LAT register.
+#define LED_TRIS            // Bootloader LED's TRIS register.
+//#define LED_ACTIVE_LOW    // Uncomment to make the Bootloader LED active low.
+#endif
+
+// PIC18Fx455 & PIC18Fx550 Settings:
+#elif defined(_18F4550_FAMILY_)
+#define MIKROE_647 0 // Compatible with MIKROE-647
+#define GENERAL    1 // Compatible with dev boards that have a reset button.
+#define CUSTOM     2 // Write your own.
+#define BOARD_VERSION GENERAL
+
+#if BOARD_VERSION == MIKROE_647
+#define XTAL_USED         MHz_8
+#define BUTTON_PORT_BIT   3
+#define BUTTON_PORT       PORTE
+#define BUTTON_ACTIVE_LOW
+#define USE_BOOT_LED
+#define LED_BIT           1
+#define LED_LAT           LATA
+#define LED_TRIS          TRISA
+
+#elif BOARD_VERSION == GENERAL
+#define XTAL_USED         MHz_8
+#define BUTTON_PORT_BIT   3
+#define BUTTON_PORT       PORTE
+#define BUTTON_ACTIVE_LOW
+
+#elif BOARD_VERSION == CUSTOM
+#define XTAL_USED           // Select oscillator option.
+#define USE_MCLRE           // Uncomment to enable MCLRE (reset pin).
+#define USE_LVP             // Uncomment if LVP (Low Voltage Programming) is needed.
+#define BUTTON_PORT_BIT     // Bootloader Button's bit in the I/O PORT.
+#define BUTTON_PORT         // Bootloader Button's I/O PORT.
+//#define BUTTON_WPU_BIT    // Uncomment and define the Bootloader Button's Weak Pull-Up pin (if needed).
+//#define BUTTON_WPU        // Uncomment and define the WPU register.
+//#define BUTTON_RXPU_BIT   // Uncomment and define the bit that enables the Weak Pull-Up pin.
+//#define BUTTON_RXPU_REG   // Uncomment and define which register has the RXPU bit to enable the Weak Pull-Up pin.
+#define BUTTON_ACTIVE_LOW   // Uncomment to make the Bootloader Button active low.
+#define USE_BOOT_LED        // Uncomment if you wish to have a Bootloader LED.
+#define LED_BIT             // Bootloader LED's bit in the LAT register.
+#define LED_LAT             // Bootloader LED's LAT register.
+#define LED_TRIS            // Bootloader LED's TRIS register.
+//#define LED_ACTIVE_LOW    // Uncomment to make the Bootloader LED active low.
+#endif
+
 // PIC18F14K50 Settings:
 #elif defined(_18F14K50)
 #define DM164127 0 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2.
 #define GENERAL  1 // Compatible with dev boards that have a reset button.
 #define DEV_BRD  2 // A custom dev board I use.
 #define CUSTOM   3 // Write your own.
-#define BOARD_VERSION DM164127
+#define BOARD_VERSION GENERAL
 
 #if BOARD_VERSION == DM164127 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2
                               // and MonkeyBUS - PIC18F14K50.
@@ -167,7 +238,7 @@
 #define P_STAR  1 // Compatible with Pololu's P-Star dev boards https://www.pololu.com/category/217/p-star-programmable-controllers.
 #define GENERAL 2 // Compatible with dev boards that have a reset button.
 #define CUSTOM  3 // Write your own.
-#define BOARD_VERSION PICDEM
+#define BOARD_VERSION GENERAL
 
 #if BOARD_VERSION == PICDEM
 #define XTAL_USED         NO_XTAL
@@ -222,13 +293,13 @@
 //#define LED_ACTIVE_LOW    // Uncomment to make the Bootloader LED active low.
 #endif
 
-// PIC18FX6J53 and PIC18FX7J53 Settings.
+// PIC18FX4J50, PIC18FX5J50, PIC18FX6J50, PIC18FX6J53, and PIC18FX7J53 Settings.
 #elif defined(__J_PART)
 #define PIM          0 // Compatible with Microchip's MA180029 dev board https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/MA180029.
 #define PIC_CLICKER  1 // Compatible with MikroElektronika's PIC clicker dev board https://www.mikroe.com/clicker-pic18fj.
 #define DEV_BRD      2 // A custom dev board I use.
 #define CUSTOM       3 // Write your own.
-#define BOARD_VERSION PIM
+#define BOARD_VERSION DEV_BRD
 
 #if BOARD_VERSION == PIM
 #define XTAL_USED         MHz_12

@@ -1,10 +1,10 @@
 /**
  * @file bootloader.h
  * @author John Izzard
- * @date 18/06/2020
+ * @date 10/03/2023
  *
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +55,54 @@
     0x1000D |______________|
  */
 
+/* PIC18FX450 ROM Space
+             ______________
+    0x00000 |____RESET_____|
+    0x00008 |____INT_HP____|
+    0x00018 |____INT_LP____| 0x2000 (8KB)
+            |              |
+            | BOOT LOADER  |
+    0x01FFF |______________|
+    0x02000 |              |
+            |  PROG MEM    | 0x2000 (8KB)
+    0x03FFF |______________|
+   0x300000 |              |
+            | CONFIG WORDS | 0x0E
+   0x30000D |______________|
+ */
+
+/* PIC18FX455 and PIC18FX458 ROM Space
+             ______________
+    0x00000 |____RESET_____|
+    0x00008 |____INT_HP____|
+    0x00018 |____INT_LP____| 0x2000 (8KB)
+            |              |
+            | BOOT LOADER  |
+    0x01FFF |______________|
+    0x02000 |              |
+            |  PROG MEM    | 0x4000 (16KB)
+    0x05FFF |______________|
+   0x300000 |              |
+            | CONFIG WORDS | 0x0E
+   0x30000D |______________|
+ */
+
+/* PIC18FX550 and PIC18FX553 ROM Space
+             ______________
+    0x00000 |____RESET_____|
+    0x00008 |____INT_HP____|
+    0x00018 |____INT_LP____| 0x2000 (8KB)
+            |              |
+            | BOOT LOADER  |
+    0x01FFF |______________|
+    0x02000 |              |
+            |  PROG MEM    | 0x6000 (24KB)
+    0x07FFF |______________|
+   0x300000 |              |
+            | CONFIG WORDS | 0x0E
+   0x30000D |______________|
+ */
+
 /* PIC18F14K50 ROM Space
              ______________
     0x00000 |____RESET_____|
@@ -101,6 +149,54 @@
    0x300000 |              |
             | CONFIG WORDS | 0x0E
    0x30000D |______________|
+ */
+
+/* PIC18FX4J50 ROM Space
+             ______________
+    0x00000 |____RESET_____|
+    0x00008 |____INT_HP____|
+    0x00018 |____INT_LP____| 0x2000 (8KB)
+            |              |
+            | BOOT LOADER  |
+    0x01FFF |______________|
+    0x02000 |              |
+            |  PROG MEM    | 0x01C00 (7KB)
+    0x03BFF |______________|
+    0x03C00 |              |
+            | CONFIG WORDS | 0x400 (1KB)
+    0x03FFF |______________|
+ */
+
+/* PIC18FX5J50 ROM Space
+             ______________
+    0x00000 |____RESET_____|
+    0x00008 |____INT_HP____|
+    0x00018 |____INT_LP____| 0x2000 (8KB)
+            |              |
+            | BOOT LOADER  |
+    0x01FFF |______________|
+    0x02000 |              |
+            |  PROG MEM    | 0x05C00 (23KB)
+    0x07BFF |______________|
+    0x07C00 |              |
+            | CONFIG WORDS | 0x400 (1KB)
+    0x07FFF |______________|
+ */
+
+/* PIC18FX6J50 ROM Space
+             ______________
+    0x00000 |____RESET_____|
+    0x00008 |____INT_HP____|
+    0x00018 |____INT_LP____| 0x2000 (8KB)
+            |              |
+            | BOOT LOADER  |
+    0x01FFF |______________|
+    0x02000 |              |
+            |  PROG MEM    | 0x0DC00 (55KB)
+    0x0FBFF |______________|
+    0x0FC00 |              |
+            | CONFIG WORDS | 0x400 (1KB)
+    0x0FFFF |______________|
  */
 
 /* PIC18FX6J53 ROM Space
@@ -150,6 +246,51 @@
 // FLASH USER SPACE
 #define FILE_SIZE 0x2000 // In bytes
 
+#elif defined(_18F2450) || defined(_18F4450)
+#define BOOT_REGION_START     0x00000
+#define PROG_REGION_START     0x02000
+#define END_OF_FLASH          0x04000
+#define ID_REGION_START       0x200000
+#define CONFIG_REGION_START   0x300000
+#define CONFIG_BLOCK_REGION   CONFIG_REGION_START
+#define CONFIG_PAGE_START     CONFIG_REGION_START
+#define DEV_ID_START          0x3FFFFE
+
+// FLASH USER SPACE
+#define FILE_SIZE 0x2000 // In bytes
+
+#elif defined(_18F2455) || defined(_18F4455) || defined(_18F2458) || defined(_18F4458)
+#define BOOT_REGION_START     0x00000
+#define PROG_REGION_START     0x02000
+#define END_OF_FLASH          0x06000
+#define ID_REGION_START       0x200000
+#define CONFIG_REGION_START   0x300000
+#define CONFIG_BLOCK_REGION   CONFIG_REGION_START
+#define CONFIG_PAGE_START     CONFIG_REGION_START
+#define DEV_ID_START          0x3FFFFE
+#define EEPROM_REGION_START   0xF00000
+#define END_OF_EEPROM         0xF00100
+#define EEPROM_SIZE           0x100
+
+// FLASH USER SPACE
+#define FILE_SIZE 0x4000 // In bytes
+
+#elif defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
+#define BOOT_REGION_START     0x00000
+#define PROG_REGION_START     0x02000
+#define END_OF_FLASH          0x08000
+#define ID_REGION_START       0x200000
+#define CONFIG_REGION_START   0x300000
+#define CONFIG_BLOCK_REGION   CONFIG_REGION_START
+#define CONFIG_PAGE_START     CONFIG_REGION_START
+#define DEV_ID_START          0x3FFFFE
+#define EEPROM_REGION_START   0xF00000
+#define END_OF_EEPROM         0xF00100
+#define EEPROM_SIZE           0x100
+
+// FLASH USER SPACE
+#define FILE_SIZE 0x6000 // In bytes
+
 #elif defined(_18F14K50) || defined(_18F24K50)
 #define BOOT_REGION_START     0x00000
 #define PROG_REGION_START     0x02000
@@ -182,7 +323,31 @@
 // FLASH USER SPACE
 #define FILE_SIZE 0x6000 // In bytes
 
-#elif defined(_18F26J53) || defined(_18F46J53)
+#elif defined(_18F24J50) || defined(_18F44J50)
+#define BOOT_REGION_START     0x00000
+#define PROG_REGION_START     0x02000
+#define CONFIG_BLOCK_REGION   0x03FC0
+#define CONFIG_REGION_START   0x03FF8
+#define CONFIG_PAGE_START     0x03C00
+#define END_OF_FLASH          0x04000
+#define DEV_ID_START          0x3FFFFE
+
+// FLASH USER SPACE
+#define FILE_SIZE 0x02000 // In bytes
+
+#elif defined(_18F25J50) || defined(_18F45J50)
+#define BOOT_REGION_START     0x00000
+#define PROG_REGION_START     0x02000
+#define CONFIG_BLOCK_REGION   0x07FC0
+#define CONFIG_REGION_START   0x07FF8
+#define CONFIG_PAGE_START     0x07C00
+#define END_OF_FLASH          0x08000
+#define DEV_ID_START          0x3FFFFE
+
+// FLASH USER SPACE
+#define FILE_SIZE 0x06000 // In bytes
+
+#elif defined(_18F26J50) || defined(_18F46J50) || defined(_18F26J53) || defined(_18F46J53)
 #define BOOT_REGION_START     0x00000
 #define PROG_REGION_START     0x02000
 #define CONFIG_BLOCK_REGION   0x0FFC0
@@ -266,15 +431,31 @@
 #define  ELA_REC  4 // Extended Linear Address Record
 #define  SLA_REC  5 // Start Linear Address Record
 
-// Volume Labels based on proccessor.
+// Volume Labels based on processor.
 #if defined(_PIC14E)
 #define VOLUME_LABEL {'P','I','C','1','6','F','1','4','5','X',' '}
+#elif defined(_18F2450) || defined(_18F4450)
+#define VOLUME_LABEL {'P','I','C','1','8','F','X','4','5','0',' '}
+#elif defined(_18F2455) || defined(_18F4455)
+#define VOLUME_LABEL {'P','I','C','1','8','F','X','4','5','5',' '}
+#elif defined(_18F2458) || defined(_18F4458)
+#define VOLUME_LABEL {'P','I','C','1','8','F','X','4','5','8',' '}
+#elif defined(_18F2550) || defined(_18F4550)
+#define VOLUME_LABEL {'P','I','C','1','8','F','X','5','5','0',' '}
+#elif defined(_18F2553) || defined(_18F4553)
+#define VOLUME_LABEL {'P','I','C','1','8','F','X','5','5','3',' '}
 #elif defined(_18F14K50)
 #define VOLUME_LABEL {'P','I','C','1','8','F','1','4','K','5','0'}
 #elif defined(_18F24K50)
 #define VOLUME_LABEL {'P','I','C','1','8','F','2','4','K','5','0'}
 #elif defined(_18F25K50) || defined(_18F45K50)
 #define VOLUME_LABEL {'P','I','C','1','8','F','X','5','K','5','0'}
+#elif defined(_18F24J50) || defined(_18F44J50)
+#define VOLUME_LABEL {'P','I','C','1','8','F','X','4','J','5','0'}
+#elif defined(_18F25J50) || defined(_18F45J50)
+#define VOLUME_LABEL {'P','I','C','1','8','F','X','5','J','5','0'}
+#elif defined(_18F26J50) || defined(_18F46J50)
+#define VOLUME_LABEL {'P','I','C','1','8','F','X','6','J','5','0'}
 #elif defined(_18F26J53) || defined(_18F46J53)
 #define VOLUME_LABEL {'P','I','C','1','8','F','X','6','J','5','3'}
 #elif defined(_18F27J53) || defined(_18F47J53)

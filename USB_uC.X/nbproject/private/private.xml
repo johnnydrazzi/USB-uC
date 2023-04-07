@@ -2,6 +2,18 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/bootloader.c</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/EEPROM.h</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/main.c</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/usb.c</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/usb_scsi_inq.c</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/config.h</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/usb_descriptors.c</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/bootloader.h</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/EEPROM.c</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/usb_hal.h</file>
+            <file>file:/C:/Users/johnn/Documents/GitHub/USB-uC/USB_uC.X/fuses.h</file>
+        </group>
     </open-files>
 </project-private>

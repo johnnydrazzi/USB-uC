@@ -1,10 +1,10 @@
 /**
  * @file bootloader.c
  * @author John Izzard
- * @date 18/06/2020
+ * @date 10/03/2023
  * 
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -573,11 +573,13 @@ static bool safely_write_block(uint24_t start_addr)
     if((start_addr < END_OF_FLASH) && (start_addr >= PROG_REGION_START)) Flash_WriteBlock(start_addr, m_flash_block);
     else if(start_addr == ID_REGION_START){}
     else if(start_addr == CONFIG_REGION_START){}
+    #ifdef HAS_EEPROM
     else if((start_addr < END_OF_EEPROM) && (start_addr >= EEPROM_REGION_START))
     {
         start_addr &= 0xFF;
         for(i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
     }
+    #endif
     else if(start_addr < PROG_REGION_START){}
     else return false;
     return true;
@@ -617,9 +619,16 @@ static uint8_t get_device(void)
         default:
             return 'X';
     }
-    #elif defined(_18F25K50) || defined(_18F45K50)
+    
+    #elif defined(_18F4550_FAMILY_)
+    if(TABLAT & 0x40) return '2';
+    else return '4';
+    #elif defined(_18F4450_FAMILY_) || defined(_18F25K50) || defined(_18F45K50) 
     if(TABLAT & 0x20) return '2';
     else return '4';
+    #elif defined(_18F46J50_FAMILY_)
+    if((TABLAT & 0xE0) > 0x40) return '4';
+    else return '2';
     #elif defined(_18F26J53) || defined(_18F46J53) || defined(_18F27J53) || defined(_18F47J53)
     if(TABLAT & 0x80) return '4';
     else return '2';

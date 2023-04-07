@@ -2,10 +2,10 @@
  * @file usb_hal.h
  * @brief <i>Hardware Abstraction Layer</i> for Endpoints.
  * @author John Izzard
- * @date 29/05/2020
+ * @date 10/03/2023
  * 
  * USB uC - USB Stack.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -231,12 +231,12 @@
 #define BDT_BASE_ADDR   0x200
 #define SETUP_DATA_ADDR 0x60
 #define EP_BUFFERS_STARTING_ADDR (BDT_BASE_ADDR + BDT_SIZE)
-#elif defined(_18F24K50)||defined(_18F25K50)||defined(_18F45K50)
-#define BDT_BASE_ADDR   0x400
+#elif defined(_18F26J53) || defined(_18F46J53) || defined(_18F27J53) || defined(_18F47J53)
+#define BDT_BASE_ADDR   0xD00
 #define SETUP_DATA_ADDR 0x60
 #define EP_BUFFERS_STARTING_ADDR (BDT_BASE_ADDR + BDT_SIZE)
-#elif defined(__J_PART)
-#define BDT_BASE_ADDR   0xD00
+#else
+#define BDT_BASE_ADDR   0x400
 #define SETUP_DATA_ADDR 0x60
 #define EP_BUFFERS_STARTING_ADDR (BDT_BASE_ADDR + BDT_SIZE)
 #endif

@@ -38,6 +38,187 @@
 #pragma config LVP = OFF
 #endif
 
+#elif defined(_18F4450_FAMILY_)
+// CONFIG1L
+#ifndef __CLANG__
+#pragma config PLLDIV = XTAL_USED // Broken using C99
+#else
+#if XTAL_USED == MHz_4
+#pragma config PLLDIV = 1
+#elif XTAL_USED == MHz_8
+#pragma config PLLDIV = 2
+#elif XTAL_USED == MHz_12
+#pragma config PLLDIV = 3
+#elif XTAL_USED == MHz_16
+#pragma config PLLDIV = 4
+#elif XTAL_USED == MHz_20
+#pragma config PLLDIV = 5
+#elif XTAL_USED == MHz_24
+#pragma config PLLDIV = 6
+#elif XTAL_USED == MHz_40
+#pragma config PLLDIV = 10
+#elif XTAL_USED == MHz_48
+#pragma config PLLDIV = 12
+#else
+#error XTAL_USED has invalid paramater
+#endif
+#endif
+#pragma config CPUDIV = OSC1_PLL2// System Clock Postscaler Selection bits ([Primary Oscillator Src: /1][96 MHz PLL Src: /2])
+#pragma config USBDIV = 2       // USB Clock Selection bit (used in Full-Speed USB mode only; UCFG:FSEN = 1) (USB clock source comes from the 96 MHz PLL divided by 2)
+
+// CONFIG1H
+#pragma config FOSC = HSPLL_HS  // Oscillator Selection bits (HS oscillator, PLL enabled (HSPLL))
+#pragma config FCMEN = OFF      // Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor disabled)
+#pragma config IESO = OFF       // Internal/External Oscillator Switchover bit (Oscillator Switchover mode disabled)
+
+// CONFIG2L
+#pragma config PWRT = ON        // Power-up Timer Enable bit (PWRT enabled)
+#pragma config BOR = SOFT       // Brown-out Reset Enable bits (Brown-out Reset enabled and controlled by software (SBOREN is enabled))
+#pragma config BORV = 28        // Brown-out Reset Voltage bits (2.8V)
+#pragma config VREGEN = ON      // USB Voltage Regulator Enable bit (USB voltage regulator enabled)
+
+// CONFIG2H
+#pragma config WDT = OFF        // Watchdog Timer Enable bit (WDT disabled (control is placed on the SWDTEN bit))
+#pragma config WDTPS = 256      // Watchdog Timer Postscale Select bits (1:256)
+
+// CONFIG3H
+#pragma config PBADEN = OFF     // PORTB A/D Enable bit (PORTB<4:0> pins are configured as digital I/O on Reset)
+#pragma config LPT1OSC = OFF    // Low-Power Timer 1 Oscillator Enable bit (Timer1 configured for higher power operation)
+#ifdef USE_MCLRE
+#pragma config MCLRE = ON
+#else
+#pragma config MCLRE = OFF
+#endif
+
+// CONFIG4L
+#pragma config STVREN = ON      // Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
+#ifdef USE_LVP
+#pragma config LVP = ON
+#else
+#pragma config LVP = OFF
+#endif
+#pragma config BBSIZ = BB1K     // Boot Block Size Select bit (1KW Boot block size)
+#pragma config XINST = OFF      // Extended Instruction Set Enable bit (Instruction set extension and Indexed Addressing mode disabled (Legacy mode))
+
+// CONFIG5L
+#pragma config CP0 = OFF        // Code Protection bit (Block 0 (000800-001FFFh) or (001000-001FFFh) is not code-protected)
+#pragma config CP1 = OFF        // Code Protection bit (Block 1 (002000-003FFFh) is not code-protected)
+
+// CONFIG5H
+#pragma config CPB = OFF        // Boot Block Code Protection bit (Boot block (000000-0007FFh) or (000000-000FFFh) is not code-protected)
+
+// CONFIG6L
+#pragma config WRT0 = ON        // Write Protection bit (Block 0 (000800-001FFFh) or (001000-001FFFh) is write-protected)
+#pragma config WRT1 = OFF       // Write Protection bit (Block 1 (002000-003FFFh) is not write-protected)
+
+// CONFIG6H
+#pragma config WRTC = ON        // Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) are write-protected)
+#pragma config WRTB = ON        // Boot Block Write Protection bit (Boot block (000000-0007FFh) or (000000-000FFFh) is write-protected)
+
+// CONFIG7L
+#pragma config EBTR0 = OFF      // Table Read Protection bit (Block 0 (000800-001FFFh) or (001000-001FFFh) is not protected from table reads executed in other blocks)
+#pragma config EBTR1 = OFF      // Table Read Protection bit (Block 1 (002000-003FFFh) is not protected from table reads executed in other blocks)
+
+// CONFIG7H
+#pragma config EBTRB = OFF      // Boot Block Table Read Protection bit (Boot block (000000-0007FFh) or (000000-000FFFh) is not protected from table reads executed in other blocks)
+
+#elif defined(_18F4550_FAMILY_)
+// CONFIG1L
+#ifndef __CLANG__
+#pragma config PLLDIV = XTAL_USED // Broken using C99
+#else
+#if XTAL_USED == MHz_4
+#pragma config PLLDIV = 1
+#elif XTAL_USED == MHz_8
+#pragma config PLLDIV = 2
+#elif XTAL_USED == MHz_12
+#pragma config PLLDIV = 3
+#elif XTAL_USED == MHz_16
+#pragma config PLLDIV = 4
+#elif XTAL_USED == MHz_20
+#pragma config PLLDIV = 5
+#elif XTAL_USED == MHz_24
+#pragma config PLLDIV = 6
+#elif XTAL_USED == MHz_40
+#pragma config PLLDIV = 10
+#elif XTAL_USED == MHz_48
+#pragma config PLLDIV = 12
+#else
+#error XTAL_USED has invalid paramater
+#endif
+#endif
+#pragma config CPUDIV = OSC1_PLL2// System Clock Postscaler Selection bits ([Primary Oscillator Src: /1][96 MHz PLL Src: /2])
+#pragma config USBDIV = 2       // USB Clock Selection bit (used in Full-Speed USB mode only; UCFG:FSEN = 1) (USB clock source comes from the 96 MHz PLL divided by 2)
+
+// CONFIG1H
+#pragma config FOSC = HSPLL_HS  // Oscillator Selection bits (HS oscillator, PLL enabled (HSPLL))
+#pragma config FCMEN = OFF      // Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor disabled)
+#pragma config IESO = OFF       // Internal/External Oscillator Switchover bit (Oscillator Switchover mode disabled)
+
+// CONFIG2L
+#pragma config PWRT = ON        // Power-up Timer Enable bit (PWRT enabled)
+#pragma config BOR = SOFT       // Brown-out Reset Enable bits (Brown-out Reset enabled and controlled by software (SBOREN is enabled))
+#pragma config BORV = 2         // Brown-out Reset Voltage bits (Setting 1 2.79V)
+#pragma config VREGEN = ON      // USB Voltage Regulator Enable bit (USB voltage regulator enabled)
+
+// CONFIG2H
+#pragma config WDT = OFF        // Watchdog Timer Enable bit (WDT disabled (control is placed on the SWDTEN bit))
+#pragma config WDTPS = 256      // Watchdog Timer Postscale Select bits (1:256)
+
+// CONFIG3H
+#pragma config CCP2MX = ON      // CCP2 MUX bit (CCP2 input/output is multiplexed with RC1)
+#pragma config PBADEN = OFF     // PORTB A/D Enable bit (PORTB<4:0> pins are configured as digital I/O on Reset)
+#pragma config LPT1OSC = OFF    // Low-Power Timer 1 Oscillator Enable bit (Timer1 configured for higher power operation)
+#ifdef USE_MCLRE
+#pragma config MCLRE = ON
+#else
+#pragma config MCLRE = OFF
+#endif
+
+// CONFIG4L
+#pragma config STVREN = ON      // Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
+#ifdef USE_LVP
+#pragma config LVP = ON
+#else
+#pragma config LVP = OFF
+#endif
+#pragma config XINST = OFF      // Extended Instruction Set Enable bit (Instruction set extension and Indexed Addressing mode disabled (Legacy mode))
+
+// CONFIG5L
+#pragma config CP0 = OFF        // Code Protection bit (Block 0 (000800-001FFFh) is not code-protected)
+#pragma config CP1 = OFF        // Code Protection bit (Block 1 (002000-003FFFh) is not code-protected)
+#pragma config CP2 = OFF        // Code Protection bit (Block 2 (004000-005FFFh) is not code-protected)
+#if defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
+#pragma config CP3 = OFF        // Code Protection bit (Block 3 (006000-007FFFh) is not code-protected)
+#endif
+
+// CONFIG5H
+#pragma config CPB = OFF        // Boot Block Code Protection bit (Boot block (000000-0007FFh) is not code-protected)
+#pragma config CPD = OFF        // Data EEPROM Code Protection bit (Data EEPROM is not code-protected)
+
+// CONFIG6L
+#pragma config WRT0 = ON        // Write Protection bit (Block 0 (000800-001FFFh) is write-protected)
+#pragma config WRT1 = OFF       // Write Protection bit (Block 1 (002000-003FFFh) is not write-protected)
+#pragma config WRT2 = OFF       // Write Protection bit (Block 2 (004000-005FFFh) is not write-protected)
+#if defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
+#pragma config WRT3 = OFF       // Write Protection bit (Block 3 (006000-007FFFh) is not write-protected)
+#endif
+
+// CONFIG6H
+#pragma config WRTC = ON        // Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) are write-protected)
+#pragma config WRTB = ON        // Boot Block Write Protection bit (Boot block (000000-0007FFh) is write-protected)
+#pragma config WRTD = OFF       // Data EEPROM Write Protection bit (Data EEPROM is not write-protected)
+
+// CONFIG7L
+#pragma config EBTR0 = OFF      // Table Read Protection bit (Block 0 (000800-001FFFh) is not protected from table reads executed in other blocks)
+#pragma config EBTR1 = OFF      // Table Read Protection bit (Block 1 (002000-003FFFh) is not protected from table reads executed in other blocks)
+#pragma config EBTR2 = OFF      // Table Read Protection bit (Block 2 (004000-005FFFh) is not protected from table reads executed in other blocks)
+#if defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
+#pragma config EBTR3 = OFF      // Table Read Protection bit (Block 3 (006000-007FFFh) is not protected from table reads executed in other blocks)
+#endif
+
+// CONFIG7H
+#pragma config EBTRB = OFF      // Boot Block Table Read Protection bit (Boot block (000000-0007FFh) is not protected from table reads executed in other blocks)
 
 #elif defined(_18F14K50)
 // CONFIG1L
@@ -188,7 +369,70 @@
 #pragma config EBTRB = OFF      // Boot Block Table Read Protect (Boot block is not protected from table reads executed in other blocks)
 
 
+#elif defined(_18F46J50_FAMILY_)
+// CONFIG1L
+#pragma config WDTEN = OFF      // Watchdog Timer (Disabled - Controlled by SWDTEN bit)
+#ifndef __CLANG__
+#pragma config PLLDIV = XTAL_USED // Broken using C99
+#else
+#if XTAL_USED == MHz_4
+#pragma config PLLDIV = 1
+#elif XTAL_USED == MHz_8
+#pragma config PLLDIV = 2
+#elif XTAL_USED == MHz_12
+#pragma config PLLDIV = 3
+#elif XTAL_USED == MHz_16
+#pragma config PLLDIV = 4
+#elif XTAL_USED == MHz_20
+#pragma config PLLDIV = 5
+#elif XTAL_USED == MHz_24
+#pragma config PLLDIV = 6
+#elif XTAL_USED == MHz_40
+#pragma config PLLDIV = 10
+#elif XTAL_USED == MHz_48
+#pragma config PLLDIV = 12
+#else
+#error XTAL_USED has invalid paramater
+#endif
+#endif
+#pragma config STVREN = ON      // Stack Overflow/Underflow Reset  (Enabled)
+#pragma config XINST = OFF      // Extended Instruction Set (Disabled)
+
+// CONFIG1H
+#pragma config CPUDIV = OSC1    // CPU System Clock Postscaler (No CPU system clock divide)
+#pragma config CP0 = OFF        // Code Protect (Program memory is not code-protected)
+
+// CONFIG2L
+#pragma config OSC = HSPLL      // Oscillator (HS+PLL, USB-HS+PLL)
+#pragma config T1DIG = ON       // T1OSCEN Enforcement (Secondary Oscillator clock source may be selected)
+#pragma config LPT1OSC = OFF    // Low-Power Timer1 Oscillator (High-power operation)
+#pragma config FCMEN = OFF      // Fail-Safe Clock Monitor (Disabled)
+#pragma config IESO = OFF       // Internal External Oscillator Switch Over Mode (Disabled)
+
+// CONFIG2H
+#pragma config WDTPS = 256      // Watchdog Postscaler (1:256)
+
+// CONFIG3L
+#pragma config DSWDTOSC = INTOSCREF// DSWDT Clock Select (DSWDT uses INTRC)
+#pragma config RTCOSC = T1OSCREF// RTCC Clock Select (RTCC uses T1OSC/T1CKI)
+#pragma config DSBOREN = OFF    // Deep Sleep BOR (Disabled)
+#pragma config DSWDTEN = OFF    // Deep Sleep Watchdog Timer (Disabled)
+#pragma config DSWDTPS = G2     // Deep Sleep Watchdog Postscaler (1:2,147,483,648 (25.7 days))
+
+// CONFIG3H
+#pragma config IOL1WAY = OFF    // IOLOCK One-Way Set Enable bit (The IOLOCK bit (PPSCON<0>) can be set and cleared as needed)
+#pragma config MSSP7B_EN = MSK7 // MSSP address masking (7 Bit address masking mode)
+
+// CONFIG4L
+#pragma config WPFP = PAGE_7    // Write/Erase Protect Page Start/End Location (Write Protect Program Flash Page 7)
+#pragma config WPEND = PAGE_0   // Write/Erase Protect Region Select (valid when WPDIS = 0) (Page 0 through WPFP<5:0> erase/write protected)
+#pragma config WPCFG = ON       // Write/Erase Protect Configuration Region (Configuration Words page erase/write-protected)
+
+// CONFIG4H
+#pragma config WPDIS = ON       // Write Protect Disable bit (WPFP<5:0>/WPEND region erase/write protected)
+
 #elif defined(_18F26J53) || defined(_18F46J53) || defined(_18F27J53) || defined(_18F47J53)
+//#elif defined(_18F47J53_FAMILY_) // Doesn't work!
 // CONFIG1L
 #pragma config WDTEN = OFF      // Watchdog Timer (Disabled - Controlled by SWDTEN bit)
 #ifndef __CLANG__

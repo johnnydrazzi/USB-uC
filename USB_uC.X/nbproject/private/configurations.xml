@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="65">
   <projectmakefile>Makefile</projectmakefile>
-  <defaultConf>0</defaultConf>
+  <defaultConf>7</defaultConf>
   <confs>
     <conf name="PIC16F1454" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -23,7 +23,7 @@
     </conf>
     <conf name="PIC16F1455" type="2">
       <platformToolSN>noToolString</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -41,7 +41,187 @@
     </conf>
     <conf name="PIC16F1459" type="2">
       <platformToolSN>noToolString</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F2450" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F4450" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F2455" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F4455" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F2550" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F4550" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F2458" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F4458" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F2553" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F4553" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -58,8 +238,8 @@
       </runprofile>
     </conf>
     <conf name="PIC18F14K50" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -76,8 +256,8 @@
       </runprofile>
     </conf>
     <conf name="PIC18F24K50" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>900A:=&lt;rev>0002:=&lt;man>Microchip Technology Inc.:=&lt;prod>PICkit 3:=&lt;sn>BUR152974071:=&lt;drv>x:=&lt;xpt>h:=end</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -94,8 +274,8 @@
       </runprofile>
     </conf>
     <conf name="PIC18F25K50" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -112,8 +292,116 @@
       </runprofile>
     </conf>
     <conf name="PIC18F45K50" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F24J50" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F44J50" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F25J50" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F45J50" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F26J50" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
+      <mdbdebugger version="1">
+        <placeholder1>place holder 1</placeholder1>
+        <placeholder2>place holder 2</placeholder2>
+      </mdbdebugger>
+      <runprofile version="6">
+        <args></args>
+        <rundir></rundir>
+        <buildfirst>true</buildfirst>
+        <console-type>0</console-type>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="PIC18F46J50" type="2">
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -131,7 +419,7 @@
     </conf>
     <conf name="PIC18F26J53" type="2">
       <platformToolSN>noToolString</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -149,7 +437,7 @@
     </conf>
     <conf name="PIC18F46J53" type="2">
       <platformToolSN>noToolString</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -166,8 +454,8 @@
       </runprofile>
     </conf>
     <conf name="PIC18F27J53" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>9012:=&lt;rev>0100:=&lt;man>Microchip Technology Incorporated:=&lt;prod>MPLAB PICkit 4:=&lt;sn>BUR202275367:=&lt;drv>x:=&lt;xpt>b:=end</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>
@@ -184,8 +472,8 @@
       </runprofile>
     </conf>
     <conf name="PIC18F47J53" type="2">
-      <platformToolSN>:=MPLABComm-USB-Microchip:=&lt;vid>04D8:=&lt;pid>900A:=&lt;rev>0002:=&lt;man>Microchip Technology Inc.:=&lt;prod>PICkit 3:=&lt;sn>BUR152974071:=&lt;drv>x:=&lt;xpt>h:=end</platformToolSN>
-      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.20\bin</languageToolchainDir>
+      <platformToolSN>noToolString</platformToolSN>
+      <languageToolchainDir>C:\Program Files\Microchip\xc8\v2.41\bin</languageToolchainDir>
       <mdbdebugger version="1">
         <placeholder1>place holder 1</placeholder1>
         <placeholder2>place holder 2</placeholder2>

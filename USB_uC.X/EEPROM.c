@@ -2,12 +2,12 @@
  * @file EEPROM.c
  * @brief EEPROM library.
  * @author John Izzard
- * @date 13/08/2017
+ * @date 10/03/2023
  * 
  * This file works with all versions
  * 
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2018  John Izzard
+ * Copyright (C) 2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ uint8_t EEPROM_Read(uint16_t address){
 }
 #endif
 
-#if defined(_18F24K50)||defined(_18F25K50)||defined(_18F45K50)||defined(_18F25K50)
+#if defined(_18F4550_FAMILY_)||defined(_18F24K50)||defined(_18F25K50)||defined(_18F45K50)
 void EEPROM_Write(uint8_t address,uint8_t data){
     EEADR = address;
     EEDATA = data;

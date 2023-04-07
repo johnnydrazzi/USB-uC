@@ -2,10 +2,10 @@
  * @file usb_descriptors.h
  * @brief Contains core USB stack descriptors stored in ROM.
  * @author John Izzard
- * @date 28/06/2020
+ * @date 20/03/2023
  *
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,25 @@
 #include "usb_ch9.h"
 
 #define DEV_DESC_PID 0xEB78
-#define REL_NUM      0x0110
+#define REL_NUM      0x0111
 
 #if defined(_PIC14E)
-
-
 #define PROD_STR {'U','S','B',' ','u','C',' ','1','4','5','X'}
+#define NUM_PROD_STR_EL 11
+#elif defined(_18F2450) || defined(_18F4450)
+#define PROD_STR {'U','S','B',' ','u','C',' ','X','4','5','0'}
+#define NUM_PROD_STR_EL 11
+#elif defined(_18F2455) || defined(_18F4455)
+#define PROD_STR {'U','S','B',' ','u','C',' ','X','4','5','5'}
+#define NUM_PROD_STR_EL 11
+#elif defined(_18F2458) || defined(_18F4458)
+#define PROD_STR {'U','S','B',' ','u','C',' ','X','4','5','8'}
+#define NUM_PROD_STR_EL 11
+#elif defined(_18F2550) || defined(_18F4550)
+#define PROD_STR {'U','S','B',' ','u','C',' ','X','5','5','0'}
+#define NUM_PROD_STR_EL 11
+#elif defined(_18F2553) || defined(_18F4553)
+#define PROD_STR {'U','S','B',' ','u','C',' ','X','5','5','3'}
 #define NUM_PROD_STR_EL 11
 #elif defined(_18F14K50)
 #define PROD_STR {'U','S','B',' ','u','C',' ','1','4','K','5','0'}
@@ -41,6 +54,15 @@
 #define NUM_PROD_STR_EL 12
 #elif defined(_18F25K50) || defined(_18F45K50)
 #define PROD_STR {'U','S','B',' ','u','C',' ','X','5','K','5','0'}
+#define NUM_PROD_STR_EL 12
+#elif defined(_18F24J50) || defined(_18F44J50)
+#define PROD_STR {'U','S','B',' ','u','C',' ','X','4','J','5','0'}
+#define NUM_PROD_STR_EL 12
+#elif defined(_18F25J50) || defined(_18F45J50)
+#define PROD_STR {'U','S','B',' ','u','C',' ','X','5','J','5','0'}
+#define NUM_PROD_STR_EL 12
+#elif defined(_18F26J50) || defined(_18F46J50)
+#define PROD_STR {'U','S','B',' ','u','C',' ','X','6','J','5','0'}
 #define NUM_PROD_STR_EL 12
 #elif defined(_18F26J53) || defined(_18F46J53)
 #define PROD_STR {'U','S','B',' ','u','C',' ','X','6','J','5','3'}

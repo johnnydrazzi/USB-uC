@@ -2,10 +2,10 @@
  * @file usb_scsi_inq.c
  * @brief Contains SCSI's Inquiry Command Response.
  * @author John Izzard
- * @date 05/06/2020
+ * @date 10/03/2023
  *
  * USB uC - MSD Library.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,16 +24,32 @@
 
 // String Settings
 #define SCSI_VENDER_ID   {'M','i','c','r','o','c','h','p'}
-#define SCSI_PRODUCT_REV {'0','1','1','0'}
+#define SCSI_PRODUCT_REV {'0','1','1','1'}
 
 #if defined(_PIC14E)
 #define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','1','4','5','X',' ',' ',' ',' ',' '}
+#elif defined(_18F2450) || defined(_18F4450)
+#define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','4','5','0',' ',' ',' ',' ',' '}
+#elif defined(_18F2455) || defined(_18F4455)
+#define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','4','5','5',' ',' ',' ',' ',' '}
+#elif defined(_18F2458) || defined(_18F4458)
+#define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','4','5','8',' ',' ',' ',' ',' '}
+#elif defined(_18F2550) || defined(_18F4550)
+#define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','5','5','0',' ',' ',' ',' ',' '}
+#elif defined(_18F2553) || defined(_18F4553)
+#define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','5','5','3',' ',' ',' ',' ',' '}
 #elif defined(_18F14K50)
 #define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','1','4','K','5','0',' ',' ',' ',' '}
 #elif defined(_18F24K50)
 #define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','2','4','K','5','0',' ',' ',' ',' '}
 #elif defined(_18F25K50) || defined(_18F45K50)
 #define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','5','K','5','0',' ',' ',' ',' '}
+#elif defined(_18F24J50) || defined(_18F44J50)
+#define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','4','J','5','0',' ',' ',' ',' '}
+#elif defined(_18F25J50) || defined(_18F45J50)
+#define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','5','J','5','0',' ',' ',' ',' '}
+#elif defined(_18F26J50) || defined(_18F46J50)
+#define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','6','J','5','0',' ',' ',' ',' '}
 #elif defined(_18F26J53) || defined(_18F46J53)
 #define SCSI_PRODUCT_ID  {'U','S','B',' ','u','C',' ','X','6','J','5','3',' ',' ',' ',' '}
 #elif defined(_18F27J53) || defined(_18F47J53)

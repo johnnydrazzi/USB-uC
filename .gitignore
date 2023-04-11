@@ -5,4 +5,4 @@ build
 debug
 dist
 *.ca
-nbproject/private
+*/private

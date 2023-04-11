@@ -49,7 +49,7 @@
 
 // PIC16F145X Settings:
 #if defined(_PIC14E)
-#define DM164127 0 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2.
+#define DM164127 0 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2
 #define GENERAL  1 // Compatible with dev boards that have a reset button.
 #define XPRESS   2 // Compatible with the programmer (PIC16F1454) on DM164141 (used it for development).
 #define CUSTOM   3 // Write your own.
@@ -202,14 +202,13 @@
 
 // PIC18F14K50 Settings:
 #elif defined(_18F14K50)
-#define DM164127 0 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2.
-#define GENERAL  1 // Compatible with dev boards that have a reset button.
-#define DEV_BRD  2 // A custom dev board I use.
-#define CUSTOM   3 // Write your own.
+#define DM164127  0 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2
+#define GENERAL   1 // Compatible with dev boards that have a reset button.
+#define DEV_BOARD 2 // A custom dev board I use.
+#define CUSTOM    3 // Write your own.
 #define BOARD_VERSION GENERAL
 
-#if BOARD_VERSION == DM164127 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2
-                              // and MonkeyBUS - PIC18F14K50.
+#if BOARD_VERSION == DM164127 // Compatible with DM164127-2/DV164139-2 and MonkeyBUS - PIC18F14K50.
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTA
 #define BUTTON_WPU_BIT    3
@@ -227,7 +226,7 @@
 #define BUTTON_WPU        WPUA
 #define BUTTON_ACTIVE_LOW
 
-#elif BOARD_VERSION == DEV_BRD
+#elif BOARD_VERSION == DEV_BOARD
 #define USE_MCLRE
 #define BUTTON_PORT_BIT   0
 #define BUTTON_PORT       PORTC
@@ -258,8 +257,8 @@
 
 // PIC18F24K50 and PIC18FX5K50 Settings.
 #elif defined(_18F24K50) || defined(_18F25K50) || defined(_18F45K50)
-#define PICDEM  0 // Compatible with DM163025-1 https://www.microchip.com/DevelopmentTools/ProductDetails/DM163025-1.
-#define P_STAR  1 // Compatible with Pololu's P-Star dev boards https://www.pololu.com/category/217/p-star-programmable-controllers.
+#define PICDEM  0 // Compatible with DM163025-1 https://www.microchip.com/DevelopmentTools/ProductDetails/DM163025-1
+#define P_STAR  1 // Compatible with Pololu's P-Star dev boards https://www.pololu.com/category/217/p-star-programmable-controllers
 #define GENERAL 2 // Compatible with dev boards that have a reset button.
 #define CUSTOM  3 // Write your own.
 #define BOARD_VERSION GENERAL
@@ -319,11 +318,11 @@
 
 // PIC18FX4J50, PIC18FX5J50, PIC18FX6J50, PIC18FX6J53, and PIC18FX7J53 Settings.
 #elif defined(__J_PART)
-#define PIM          0 // Compatible with Microchip's MA180029 dev board https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/MA180029.
-#define PIC_CLICKER  1 // Compatible with MikroElektronika's PIC clicker dev board https://www.mikroe.com/clicker-pic18fj.
+#define PIM          0 // Compatible with Microchip's MA180029 dev board https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/MA180029
+#define PIC_CLICKER  1 // Compatible with MikroElektronika's PIC clicker dev board https://www.mikroe.com/clicker-pic18fj
 #define DEV_BOARD    2 // A custom dev board I use.
 #define CUSTOM       3 // Write your own.
-#define BOARD_VERSION DEV_BRD
+#define BOARD_VERSION DEV_BOARD
 
 #if BOARD_VERSION == PIM
 #define XTAL_USED         MHz_12

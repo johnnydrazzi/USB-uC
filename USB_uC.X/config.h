@@ -108,7 +108,8 @@
 // PIC18Fx450 Settings:
 #elif defined(_18F4450_FAMILY_)
 #define GENERAL    0 // Compatible with dev boards that have a reset button.
-#define CUSTOM     1 // Write your own.
+#define DEV_BOARD  1 // A custom dev board I use.
+#define CUSTOM     2 // Write your own.
 #define BOARD_VERSION GENERAL
 
 #if BOARD_VERSION == GENERAL
@@ -116,6 +117,17 @@
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTE
 #define BUTTON_ACTIVE_LOW
+
+#elif BOARD_VERSION == DEV_BOARD
+#define XTAL_USED         MHz_8
+#define USE_MCLRE
+#define USE_LVP
+#define BUTTON_PORT_BIT   6
+#define BUTTON_PORT       PORTB
+#define USE_BOOT_LED
+#define LED_BIT           7
+#define LED_LAT           LATB
+#define LED_TRIS          TRISB
 
 #elif BOARD_VERSION == CUSTOM
 #define XTAL_USED           // Select oscillator option.
@@ -135,11 +147,12 @@
 //#define LED_ACTIVE_LOW    // Uncomment to make the Bootloader LED active low.
 #endif
 
-// PIC18Fx455 & PIC18Fx550 Settings:
+// PIC18Fx455, PIC18Fx550, PIC18Fx458 & PIC18Fx553 Settings:
 #elif defined(_18F4550_FAMILY_)
 #define MIKROE_647 0 // Compatible with MIKROE-647
-#define GENERAL    1 // Compatible with dev boards that have a reset button.
-#define CUSTOM     2 // Write your own.
+#define DEV_BOARD  1 // A custom dev board I use.
+#define GENERAL    2 // Compatible with dev boards that have a reset button.
+#define CUSTOM     3 // Write your own.
 #define BOARD_VERSION GENERAL
 
 #if BOARD_VERSION == MIKROE_647
@@ -151,6 +164,17 @@
 #define LED_BIT           1
 #define LED_LAT           LATA
 #define LED_TRIS          TRISA
+
+#elif BOARD_VERSION == DEV_BOARD
+#define XTAL_USED         MHz_8
+#define USE_MCLRE
+#define USE_LVP
+#define BUTTON_PORT_BIT   6
+#define BUTTON_PORT       PORTB
+#define USE_BOOT_LED
+#define LED_BIT           7
+#define LED_LAT           LATB
+#define LED_TRIS          TRISB
 
 #elif BOARD_VERSION == GENERAL
 #define XTAL_USED         MHz_8
@@ -297,7 +321,7 @@
 #elif defined(__J_PART)
 #define PIM          0 // Compatible with Microchip's MA180029 dev board https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/MA180029.
 #define PIC_CLICKER  1 // Compatible with MikroElektronika's PIC clicker dev board https://www.mikroe.com/clicker-pic18fj.
-#define DEV_BRD      2 // A custom dev board I use.
+#define DEV_BOARD    2 // A custom dev board I use.
 #define CUSTOM       3 // Write your own.
 #define BOARD_VERSION DEV_BRD
 
@@ -323,7 +347,7 @@
 #define LED_LAT           LATA
 #define LED_TRIS          TRISA
 
-#elif BOARD_VERSION == DEV_BRD
+#elif BOARD_VERSION == DEV_BOARD
 #define XTAL_USED         MHz_16
 #define BUTTON_PORT_BIT   6
 #define BUTTON_PORT       PORTB

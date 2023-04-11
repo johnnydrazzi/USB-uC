@@ -2,30 +2,17 @@
 #include <xc.h>
 #include <stdint.h>
 
-#define MHz_4  1
-#define MHz_8  2
-#define MHz_12 3
-#define MHz_16 4
-#define MHz_20 5
-#define MHz_24 6
-#define MHz_40 10
-#define MHz_48 12
-
 #define GENERAL    0 // Compatible with dev boards that have a reset button.
 #define DEV_BOARD  1 // A custom dev board I use.
 #define CUSTOM     2 // Write your own.
 #define BOARD_VERSION DEV_BOARD
 
 #if BOARD_VERSION == GENERAL
-#define XTAL_USED         MHz_8
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTE
 #define BUTTON_ACTIVE_LOW
 
 #elif BOARD_VERSION == DEV_BOARD
-#define XTAL_USED         MHz_8
-#define USE_MCLRE
-#define USE_LVP
 #define BUTTON_PORT_BIT   6
 #define BUTTON_PORT       PORTB
 #define USE_BOOT_LED
@@ -34,9 +21,6 @@
 #define LED_TRIS          TRISB
 
 #elif BOARD_VERSION == CUSTOM
-#define XTAL_USED           // Select oscillator option.
-#define USE_MCLRE           // Uncomment to enable MCLRE (reset pin).
-#define USE_LVP             // Uncomment if LVP (Low Voltage Programming) is needed.
 #define BUTTON_PORT_BIT     // Bootloader Button's bit in the I/O PORT.
 #define BUTTON_PORT         // Bootloader Button's I/O PORT.
 //#define BUTTON_WPU_BIT    // Uncomment and define the Bootloader Button's Weak Pull-Up pin (if needed).

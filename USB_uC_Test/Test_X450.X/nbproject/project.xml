@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>Test_4450_FAMILY</name>
+            <name>Test_X450</name>
             <creation-uuid>fc379053-bf30-45af-a7d6-ebe2d476e46c</creation-uuid>
             <make-project-type>0</make-project-type>
             <sourceEncoding>ISO-8859-1</sourceEncoding>

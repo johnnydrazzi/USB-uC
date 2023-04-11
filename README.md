@@ -11,7 +11,7 @@ A bootloader for PIC microcontrollers, that makes your USB capable PIC appear to
 - Read and write to EEPROM through a EEPROM.BIN file.
 - Erase EEPROM by deleting EEPROM.BIN.
   
-**Currently supports:**
+**Currently supports:**<br>
 PIC16F1459 Family:
 - PIC16F1454
 - PIC16F1455

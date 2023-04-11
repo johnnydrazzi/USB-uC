@@ -2,20 +2,11 @@
 #include <xc.h>
 #include <stdint.h>
 
-#define MHz_4  1
-#define MHz_8  2
-#define MHz_12 3
-#define MHz_16 4
-#define MHz_20 5
-#define MHz_24 6
-#define MHz_40 10
-#define MHz_48 12
-
 #define PIM          0 // Compatible with Microchip's MA180029 dev board https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/MA180029.
 #define PIC_CLICKER  1 // Compatible with MikroElektronika's PIC clicker dev board https://www.mikroe.com/clicker-pic18fj.
-#define DEV_BRD      2 // A custom dev board I use.
+#define DEV_BOARD    2 // A custom dev board I use.
 #define CUSTOM       3 // Write your own.
-#define BOARD_VERSION PIM
+#define BOARD_VERSION DEV_BOARD
 
 #if BOARD_VERSION == PIM
 #define BUTTON_PORT_BIT   2
@@ -35,7 +26,7 @@
 #define LED_LAT           LATA
 #define LED_TRIS          TRISA
 
-#elif BOARD_VERSION == DEV_BRD
+#elif BOARD_VERSION == DEV_BOARD
 #define BUTTON_PORT_BIT   6
 #define BUTTON_PORT       PORTB
 #define LED_BIT           7

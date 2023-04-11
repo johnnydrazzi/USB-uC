@@ -1,10 +1,10 @@
 
 #include <xc.h>
 
-#define DM164127 0 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2.
-#define GENERAL  1 // Compatible with dev boards that have a reset button.
-#define DEV_BRD  2 // A custom dev board I use.
-#define CUSTOM   3 // Write your own.
+#define DM164127  0 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2.
+#define GENERAL   1 // Compatible with dev boards that have a reset button.
+#define DEV_BOARD 2 // A custom dev board I use.
+#define CUSTOM    3 // Write your own.
 #define BOARD_VERSION DM164127
 
 #if BOARD_VERSION == DM164127 // Compatible with DM164127-2/DV164139-2 https://www.microchip.com/developmenttools/ProductDetails/PartNO/DM164127-2
@@ -28,7 +28,7 @@
 #define LED_LAT
 #define LED_TRIS
 
-#elif BOARD_VERSION == DEV_BRD
+#elif BOARD_VERSION == DEV_BOARD
 #define BUTTON_PORT_BIT   0
 #define BUTTON_PORT       PORTC
 #define BUTTON_ANSEL_BIT  4

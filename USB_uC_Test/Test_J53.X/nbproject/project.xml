@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>Test_J53</name>
+            <name>Test_J_PART</name>
             <creation-uuid>94763126-0267-423e-9e2c-42d6837234bd</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
@@ -28,6 +28,30 @@
                 </confElem>
                 <confElem>
                     <name>PIC18F47J53</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F24J50</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F44J50</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F25J50</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F45J50</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F26J50</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F46J50</name>
                     <type>2</type>
                 </confElem>
             </confList>

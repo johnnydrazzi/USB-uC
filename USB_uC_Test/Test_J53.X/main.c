@@ -122,11 +122,11 @@ static void inline init(void)
 
     // Apply pull-up.
     #ifdef BUTTON_WPU
-    #if defined(_18F26J53) || defined(_18F27J53)
+    #if defined(_18F24J50) || defined(_18F25J50) || defined(_18F26J50) || defined(_18F26J53) || defined(_18F27J53)
     LATB = 0;
     BUTTON_WPU |= (1 << BUTTON_WPU_BIT);
     BUTTON_RXPU_REG &= ~(1 << BUTTON_RXPU_BIT);
-    #elif defined(_18F46J53) || defined(_18F47J53)
+    #elif defined(_18F44J50) || defined(_18F45J50) || defined(_18F46J50) || defined(_18F46J53) || defined(_18F47J53)
     LATB = 0;
     LATD = 0;
     LATE = 0;

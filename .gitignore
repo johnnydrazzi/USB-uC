@@ -5,3 +5,4 @@ dist
 .ca
 Makefile-*
 Package-*
+*\private

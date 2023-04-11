@@ -30,59 +30,11 @@
                     <type>2</type>
                 </confElem>
                 <confElem>
-                    <name>PIC18F2450</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F4450</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F2455</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F4455</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F2550</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F4550</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F2458</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F4458</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F2553</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F4553</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
                     <name>PIC18F14K50</name>
                     <type>2</type>
                 </confElem>
                 <confElem>
                     <name>PIC18F24K50</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F25K50</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>PIC18F45K50</name>
                     <type>2</type>
                 </confElem>
                 <confElem>
@@ -99,6 +51,14 @@
                 </confElem>
                 <confElem>
                     <name>PIC18F45J50</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F25K50</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F45K50</name>
                     <type>2</type>
                 </confElem>
                 <confElem>
@@ -123,6 +83,46 @@
                 </confElem>
                 <confElem>
                     <name>PIC18F47J53</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F2450</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F4450</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F2455</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F4455</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F2458</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F4458</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F2550</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F4550</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F2553</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC18F4553</name>
                     <type>2</type>
                 </confElem>
             </confList>

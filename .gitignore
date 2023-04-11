@@ -1,8 +1,8 @@
 .DS_Store
-.mk
-.bash
-build/
-debug/
-dist/
-.ca/
+*.mk
+*.bash
+build
+debug
+dist
+*.ca
 nbproject/private

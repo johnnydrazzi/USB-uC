@@ -113,13 +113,13 @@
 #define BOARD_VERSION GENERAL
 
 #if BOARD_VERSION == GENERAL
-#define XTAL_USED         MHz_8
+#define XTAL_USED         MHz_12
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTE
 #define BUTTON_ACTIVE_LOW
 
 #elif BOARD_VERSION == DEV_BOARD
-#define XTAL_USED         MHz_8
+#define XTAL_USED         MHz_12
 #define USE_MCLRE
 #define USE_LVP
 #define BUTTON_PORT_BIT   6
@@ -166,7 +166,7 @@
 #define LED_TRIS          TRISA
 
 #elif BOARD_VERSION == DEV_BOARD
-#define XTAL_USED         MHz_8
+#define XTAL_USED         MHz_12
 #define USE_MCLRE
 #define USE_LVP
 #define BUTTON_PORT_BIT   6
@@ -177,7 +177,7 @@
 #define LED_TRIS          TRISB
 
 #elif BOARD_VERSION == GENERAL
-#define XTAL_USED         MHz_8
+#define XTAL_USED         MHz_12
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTE
 #define BUTTON_ACTIVE_LOW
@@ -347,7 +347,7 @@
 #define LED_TRIS          TRISA
 
 #elif BOARD_VERSION == DEV_BOARD
-#define XTAL_USED         MHz_16
+#define XTAL_USED         MHz_12
 #define BUTTON_PORT_BIT   6
 #define BUTTON_PORT       PORTB
 #define USE_BOOT_LED

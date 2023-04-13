@@ -2107,7 +2107,7 @@
     <conf name="PIC18F24J50" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC18F26J53</targetDevice>
+        <targetDevice>PIC18F24J50</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>noID</platformTool>
@@ -2251,7 +2251,7 @@
     <conf name="PIC18F44J50" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC18F26J53</targetDevice>
+        <targetDevice>PIC18F44J50</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>noID</platformTool>
@@ -2395,7 +2395,7 @@
     <conf name="PIC18F25J50" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC18F26J53</targetDevice>
+        <targetDevice>PIC18F25J50</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>noID</platformTool>
@@ -2539,7 +2539,7 @@
     <conf name="PIC18F45J50" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC18F26J53</targetDevice>
+        <targetDevice>PIC18F45J50</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>noID</platformTool>
@@ -3771,7 +3771,7 @@
     <conf name="PIC18F26J50" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC18F26J53</targetDevice>
+        <targetDevice>PIC18F26J50</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>noID</platformTool>

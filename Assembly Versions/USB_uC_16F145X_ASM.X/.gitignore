@@ -1,0 +1,7 @@
+nbproject/private
+build
+dist
+debug
+Makefile-*.*
+Package-*.*
+Configurations-*.*

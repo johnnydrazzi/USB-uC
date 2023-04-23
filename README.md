@@ -1,5 +1,6 @@
-# USB uC
+# USB uC GCB
 ![Alt text](Images/USB_uC_27J53_2.jpg?raw=true "USB_uC_27J53")    
+Experimental Great Cow BASIC version.
 A bootloader for PIC microcontrollers, that makes your USB capable PIC appear to your computer as a thumb drive. Programming can be done through MPLABX or by simply dragging and dropping your Intel hex file onto the drive. No programmer, drivers or software to install.
 
 The USB stack has been compliance tested using USB-IF's USB 3 Command Verifier (USB3CV) tool.  

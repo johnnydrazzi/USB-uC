@@ -241,14 +241,13 @@
 #define FLASH_WRITE_SIZE  _FLASH_WRITE_SIZE
 #endif
 
+#define FLASH_START           0x00000
+
 // Memory Regions.
 #if defined(_PIC14E)
 #define BOOT_REGION_START     0x02000
-#define FLASH_START           0x00000
-#define FLASH_END             0x04000
 #define PROG_REGION_START     0x00010
-#define PROG_ISR_START        (PROG_REGION_START + 0x08)
-#define PROG_REGION_END       0x02000
+#define PROG_REGION_END       BOOT_REGION_START
 #define CONFIG_REGION_START   0x10000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
 #define CONFIG_PAGE_START     CONFIG_REGION_START
@@ -258,9 +257,9 @@
 #define FILE_SIZE 0x2000 // In bytes
 
 #elif defined(_18F2450) || defined(_18F4450)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
-#define END_OF_FLASH          0x04000
+#define BOOT_REGION_START     0x02000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -271,9 +270,9 @@
 #define FILE_SIZE 0x2000 // In bytes
 
 #elif defined(_18F2455) || defined(_18F4455) || defined(_18F2458) || defined(_18F4458)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
-#define END_OF_FLASH          0x06000
+#define BOOT_REGION_START     0x04000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -287,9 +286,9 @@
 #define FILE_SIZE 0x4000 // In bytes
 
 #elif defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
-#define END_OF_FLASH          0x08000
+#define BOOT_REGION_START     0x06000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -303,9 +302,9 @@
 #define FILE_SIZE 0x6000 // In bytes
 
 #elif defined(_18F14K50) || defined(_18F24K50)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
-#define END_OF_FLASH          0x04000
+#define BOOT_REGION_START     0x02000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -319,9 +318,9 @@
 #define FILE_SIZE 0x2000 // In bytes
 
 #elif defined(_18F25K50) || defined(_18F45K50)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
-#define END_OF_FLASH          0x08000
+#define BOOT_REGION_START     0x06000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -335,8 +334,9 @@
 #define FILE_SIZE 0x6000 // In bytes
 
 #elif defined(_18F24J50) || defined(_18F44J50)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
+#define BOOT_REGION_START     0x02000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define CONFIG_BLOCK_REGION   0x03FC0
 #define CONFIG_REGION_START   0x03FF8
 #define CONFIG_PAGE_START     0x03C00
@@ -347,8 +347,9 @@
 #define FILE_SIZE 0x02000 // In bytes
 
 #elif defined(_18F25J50) || defined(_18F45J50)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
+#define BOOT_REGION_START     0x06000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define CONFIG_BLOCK_REGION   0x07FC0
 #define CONFIG_REGION_START   0x07FF8
 #define CONFIG_PAGE_START     0x07C00
@@ -359,8 +360,9 @@
 #define FILE_SIZE 0x06000 // In bytes
 
 #elif defined(_18F26J50) || defined(_18F46J50) || defined(_18F26J53) || defined(_18F46J53)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
+#define BOOT_REGION_START     0x0E000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define CONFIG_BLOCK_REGION   0x0FFC0
 #define CONFIG_REGION_START   0x0FFF8
 #define CONFIG_PAGE_START     0x0FC00
@@ -371,8 +373,9 @@
 #define FILE_SIZE 0x0E000 // In bytes
 
 #elif defined(_18F27J53) || defined(_18F47J53)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
+#define BOOT_REGION_START     0x1E000
+#define PROG_REGION_START     0x00020
+#define PROG_REGION_END       BOOT_REGION_START
 #define CONFIG_BLOCK_REGION   0x1FFC0
 #define CONFIG_REGION_START   0x1FFF8
 #define CONFIG_PAGE_START     0x1FC00

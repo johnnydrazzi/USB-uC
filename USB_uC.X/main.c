@@ -39,6 +39,28 @@
 #include "bootloader.h"
 #include "flash.h"
 
+#if defined(_PIC14E)
+// Force to keep unused functions outside of ROM range.
+__asm("GLOBAL _reset_vect");
+
+void reset_vect(void) __at(FLASH_START)
+{
+    __asm("PAGESEL "___mkstr(BOOT_REGION_START / 2));
+    __asm("GOTO "___mkstr(BOOT_REGION_START / 2));
+    __asm("MOVWI -1[FSR1]");
+    __asm("MOVWI -1[FSR1]");
+    __asm("PAGESEL "___mkstr((PROG_REGION_START + 0x08) / 2));
+    __asm("GOTO "___mkstr((PROG_REGION_START + 0x08) / 2));
+
+}
+#else
+#define ASM_GOTO(x) (0xF000EF00 | (x & 0x000000FF) | ((x & 0x000FFF00) << 8))
+
+const uint32_t reset_vect  __at(FLASH_START)        = ASM_GOTO(BOOT_REGION_START / 2);
+const uint32_t int_hi_vect __at(FLASH_START + 0x08) = ASM_GOTO((PROG_REGION_START + 0x8) / 2);
+const uint32_t int_lo_vect __at(FLASH_START + 0x18) = ASM_GOTO((PROG_REGION_START + 0x18) / 2);
+#endif
+
 static void inline boot_init(void);
 static void inline boot_uninit(void);
 static void check_user_first_inst(void);
@@ -47,25 +69,7 @@ bool user_firmware = false;
 
 static uint8_t m_delay_cnt = 0;
 
-// Force to keep unused functions outside of ROM range.
-__asm("GLOBAL _reset_vect");
 
-void reset_vect(void) __at(FLASH_START)
-{
-#if defined(_PIC14E)
-    __asm("PAGESEL "___mkstr(BOOT_REGION_START / 2));
-    __asm("GOTO "___mkstr(BOOT_REGION_START / 2));
-    __asm("MOVWI -1[FSR1]");
-    __asm("MOVWI -1[FSR1]");
-    __asm("GOTO "___mkstr(PROG_ISR_START / 2));
-#else
-    __asm("GOTO "___mkstr(BOOT_REGION_START));
-    __asm("NOP");
-    __asm("NOP");
-    __asm("NOP");
-    __asm("GOTO "___mkstr(PROG_ISR_START));
-#endif
-}
 
 void main(void)
 {

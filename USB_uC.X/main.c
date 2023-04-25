@@ -47,24 +47,25 @@ bool user_firmware = false;
 
 static uint8_t m_delay_cnt = 0;
 
-static void goto_boot(void) __at(RESET_VECT)
-{
-    __asm("LJMP "___mkstr((BOOT_REGION_START / 2)));
-}
+// Force to keep unused functions outside of ROM range.
+__asm("GLOBAL _reset_vect");
 
+void reset_vect(void) __at(FLASH_START)
+{
 #if defined(_PIC14E)
-void __interrupt() isr(void)
-{
-    __asm("LJMP "___mkstr(((PROG_REGION_START / 2) + 0x4)));
-}
+    __asm("PAGESEL "___mkstr(BOOT_REGION_START / 2));
+    __asm("GOTO "___mkstr(BOOT_REGION_START / 2));
+    __asm("MOVWI -1[FSR1]");
+    __asm("MOVWI -1[FSR1]");
+    __asm("GOTO "___mkstr(PROG_ISR_START / 2));
 #else
-__asm("PSECT intcode");
-__asm("goto    "___mkstr(PROG_REGION_START + 0x08));
-__asm("PSECT intcodelo");
-__asm("goto    "___mkstr(PROG_REGION_START + 0x18));
+    __asm("GOTO "___mkstr(BOOT_REGION_START));
+    __asm("NOP");
+    __asm("NOP");
+    __asm("NOP");
+    __asm("GOTO "___mkstr(PROG_ISR_START));
 #endif
-
-//const uint16_t test_prog __at(PROG_REGION_START) = 0;
+}
 
 void main(void)
 {
@@ -94,9 +95,9 @@ void main(void)
     // User firmware detected.
     boot_uninit();
     #if defined(_PIC14E)
-    __asm("LJMP "___mkstr(USER_GOTO / 2));
+    __asm("LJMP "___mkstr(PROG_REGION_START / 2));
     #else
-    __asm("GOTO " ___mkstr(USER_GOTO));
+    __asm("GOTO " ___mkstr(PROG_REGION_START));
     #endif
     
     // Button was pushed while in bootloader.
@@ -315,7 +316,7 @@ static void check_user_first_inst(void)
 {
 #if defined(_PIC14E)
     PMCON1 = 0;
-    PMADR = (USER_GOTO / 2);
+    PMADR = (PROG_REGION_START / 2);
     PMCON1bits.RD = 1;
     __asm("NOP");
     __asm("NOP");
@@ -324,7 +325,7 @@ static void check_user_first_inst(void)
 #else
     uint8_t inst[2];
     EECON1 = 0x80;
-    TBLPTR = USER_GOTO;
+    TBLPTR = PROG_REGION_START;
     __asm("TBLRDPOSTINC");
     inst[0] = TABLAT;
     __asm("TBLRDPOSTINC");

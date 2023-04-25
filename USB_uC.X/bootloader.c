@@ -35,7 +35,7 @@
 bool g_boot_reset;
 
 static uint8_t  m_flash_block[FLASH_WRITE_SIZE];
-static uint24_t m_prev_flash_addr = PROG_REGION_START;
+static uint24_t m_prev_flash_addr = 0;
 static uint8_t  m_prev_block_index = 0;
 
 extern bool     user_firmware;
@@ -55,6 +55,8 @@ static bool update_erase_block(uint24_t address, uint8_t* data, uint8_t cnt)
     uint16_t i;
     uint8_t  block_index = address & INDEX_MASK;
     uint24_t flash_addr  = address & FLASH_ADDR_MASK;
+    
+    if(flash_addr == 0 && block_index < 16) return false; // This is a protected area, user must have not applied an offset.
 
     if((flash_addr != m_prev_flash_addr) && (m_prev_block_index != 0)) // If new block
     {
@@ -356,7 +358,6 @@ void boot_process_write(void)
                 if(hex_result != HEX_PARSING)
                 {
                     if(hex_result == HEX_FAULT) delete_file();
-                    else {} // Write goto user instruction
                     boot_state = BOOT_FINISHED;
                     g_boot_reset = true;
                     break;
@@ -541,8 +542,14 @@ static bool hex_char_to_char(uint8_t* chr)
 static void delete_file(void)
 {
 #if defined(_PIC14E)
-    Flash_Erase(PROG_REGION_START / 2, PROG_REGION_END / 2);
-    Flash_Erase(USER_GOTO / 2, FLASH_END / 2);
+    // Preserve first 8 instructions
+    usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block));
+    Flash_ReadBytes(FLASH_START, 16, m_flash_block);
+    
+    Flash_Erase(FLASH_START, PROG_REGION_END / 2);
+    
+    // Restore first 8 instructions
+    Flash_WriteBlock(FLASH_START, m_flash_block);
 #elif (__J_PART)
     Flash_Erase(PROG_REGION_START, CONFIG_PAGE_START);
 #else
@@ -553,11 +560,13 @@ static void delete_file(void)
 static bool safely_write_block(uint24_t start_addr)
 {
 #if defined(_PIC14E)
-    if(start_addr == PROG_REGION_START)
+    if(start_addr == FLASH_START)
     {
-        // Write the goto bootloader instruction into m_flash_block
+        // Preserve first 8 instructions
+        Flash_ReadBytes(FLASH_START, 16, m_flash_block);
+        Flash_WriteBlock(start_addr / 2, m_flash_block);
     }
-    else if((start_addr < PROG_REGION_END) && (start_addr > PROG_REGION_START)) Flash_WriteBlock(start_addr / 2, m_flash_block);
+    else if(start_addr < PROG_REGION_END) Flash_WriteBlock(start_addr / 2, m_flash_block);
     else if(start_addr == CONFIG_REGION_START){}
     else return false;
     return true;
@@ -587,7 +596,7 @@ static bool safely_write_block(uint24_t start_addr)
 #ifndef SIMPLE_BOOTLOADER
 static uint32_t LBA_to_flash_addr(uint32_t LBA)
 {
-    return ((LBA - PROG_MEM_SECT_ADDR) << 9) + PROG_REGION_START + g_msd_byte_of_sect;
+    return ((LBA - PROG_MEM_SECT_ADDR) << 9) + FLASH_START + g_msd_byte_of_sect;
 }
 #endif
 

@@ -29,13 +29,6 @@
 #include "flash.h"
 #include "EEPROM.h"
 
-#if defined(_PIC14E)
-// _FLASH_WRITE_SIZE is in words (14bits), double to be in bytes.
-#define FLASH_WRITE_SIZE (_FLASH_WRITE_SIZE * 2)
-#else
-#define FLASH_WRITE_SIZE  _FLASH_WRITE_SIZE
-#endif
-
 #define INDEX_MASK (((uint24_t)FLASH_WRITE_SIZE) - 1)
 #define FLASH_ADDR_MASK ~INDEX_MASK
 
@@ -264,7 +257,7 @@ void boot_process_read(void)
         {
             // Convert from LBA address space to flash address space.
             uint24_t addr = LBA_to_flash_addr(g_msd_rw_10_vars.LBA);
-            if(addr < END_OF_FLASH) // If address is in flash space.
+            if(addr < PROG_REGION_END) // If address is in flash space.
             {
                 // Read flash into g_msd_ep_in buffer.
                 #if defined(_PIC14E)
@@ -363,6 +356,7 @@ void boot_process_write(void)
                 if(hex_result != HEX_PARSING)
                 {
                     if(hex_result == HEX_FAULT) delete_file();
+                    else {} // Write goto user instruction
                     boot_state = BOOT_FINISHED;
                     g_boot_reset = true;
                     break;
@@ -547,7 +541,8 @@ static bool hex_char_to_char(uint8_t* chr)
 static void delete_file(void)
 {
 #if defined(_PIC14E)
-    Flash_Erase(PROG_REGION_START / 2, END_OF_FLASH / 2);
+    Flash_Erase(PROG_REGION_START / 2, PROG_REGION_END / 2);
+    Flash_Erase(USER_GOTO / 2, FLASH_END / 2);
 #elif (__J_PART)
     Flash_Erase(PROG_REGION_START, CONFIG_PAGE_START);
 #else
@@ -558,9 +553,12 @@ static void delete_file(void)
 static bool safely_write_block(uint24_t start_addr)
 {
 #if defined(_PIC14E)
-    if((start_addr < END_OF_FLASH) && (start_addr >= PROG_REGION_START)) Flash_WriteBlock(start_addr / 2, m_flash_block);
+    if(start_addr == PROG_REGION_START)
+    {
+        // Write the goto bootloader instruction into m_flash_block
+    }
+    else if((start_addr < PROG_REGION_END) && (start_addr > PROG_REGION_START)) Flash_WriteBlock(start_addr / 2, m_flash_block);
     else if(start_addr == CONFIG_REGION_START){}
-    else if(start_addr < PROG_REGION_START){}
     else return false;
     return true;
 #elif defined(__J_PART)

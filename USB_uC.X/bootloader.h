@@ -233,11 +233,21 @@
 
 #include "config.h"
 
+#if defined(_PIC14E)
+// _FLASH_WRITE_SIZE is in words (14bits), double to be in bytes.
+#define FLASH_WRITE_SIZE (_FLASH_WRITE_SIZE * 2)
+#else
+#define FLASH_WRITE_SIZE  _FLASH_WRITE_SIZE
+#endif
+
 // Memory Regions.
 #if defined(_PIC14E)
-#define BOOT_REGION_START     0x00000
-#define PROG_REGION_START     0x02000
-#define END_OF_FLASH          0x04000
+#define BOOT_REGION_START     0x02000
+#define USER_GOTO             (FLASH_END - FLASH_WRITE_SIZE)
+#define RESET_VECT            0x00000
+#define PROG_REGION_START     0x00010
+#define PROG_REGION_END       0x02000
+#define FLASH_END             0x04000
 #define CONFIG_REGION_START   0x10000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
 #define CONFIG_PAGE_START     CONFIG_REGION_START

@@ -2,7 +2,7 @@
  * @file main.c
  * @brief Main C file.
  * @author John Izzard
- * @date 10/03/2023
+ * @date 25/04/2023
  * 
  * USB uC - USB MSD Bootloader.
  * Copyright (C) 2017-2023  John Izzard

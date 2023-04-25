@@ -40,7 +40,9 @@
 #include "flash.h"
 
 #if defined(_PIC14E)
-void __interrupt() isr(void)
+__asm("GLOBAL _isr");
+
+void isr(void) __at(0x4)
 {
     __asm("LJMP "___mkstr(((PROG_REGION_START / 2) + 0x4)));
 }

@@ -2,6 +2,7 @@
 #define FUSES_H
 
 #include "config.h"
+#include "bootloader.h"
 
 #if defined(_PIC14E)
 // CONFIG1
@@ -107,6 +108,15 @@
 // CONFIG5H
 #pragma config CPB = OFF        // Boot Block Code Protection bit (Boot block (000000-0007FFh) or (000000-000FFFh) is not code-protected)
 
+#ifdef LEGACY_LOC // Modified for LEGACY_LOC version.
+// CONFIG6L
+#pragma config WRT0 = OFF       // Write Protection bit (Block 0 (000800-001FFFh) or (001000-001FFFh) is not write-protected)
+#pragma config WRT1 = ON        // Write Protection bit (Block 1 (002000-003FFFh) is write-protected)
+
+// CONFIG6H
+#pragma config WRTC = ON        // Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) are write-protected)
+#pragma config WRTB = OFF       // Boot Block Write Protection bit (Boot block (000000-0007FFh) or (000000-000FFFh) is not write-protected)
+#else
 // CONFIG6L
 #pragma config WRT0 = ON        // Write Protection bit (Block 0 (000800-001FFFh) or (001000-001FFFh) is write-protected)
 #pragma config WRT1 = OFF       // Write Protection bit (Block 1 (002000-003FFFh) is not write-protected)
@@ -114,6 +124,7 @@
 // CONFIG6H
 #pragma config WRTC = ON        // Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) are write-protected)
 #pragma config WRTB = ON        // Boot Block Write Protection bit (Boot block (000000-0007FFh) or (000000-000FFFh) is write-protected)
+#endif
 
 // CONFIG7L
 #pragma config EBTR0 = OFF      // Table Read Protection bit (Block 0 (000800-001FFFh) or (001000-001FFFh) is not protected from table reads executed in other blocks)
@@ -188,7 +199,7 @@
 #pragma config CP0 = OFF        // Code Protection bit (Block 0 (000800-001FFFh) is not code-protected)
 #pragma config CP1 = OFF        // Code Protection bit (Block 1 (002000-003FFFh) is not code-protected)
 #pragma config CP2 = OFF        // Code Protection bit (Block 2 (004000-005FFFh) is not code-protected)
-#if defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
+#if defined(_18F4550) || defined(_18F4553)
 #pragma config CP3 = OFF        // Code Protection bit (Block 3 (006000-007FFFh) is not code-protected)
 #endif
 
@@ -196,11 +207,27 @@
 #pragma config CPB = OFF        // Boot Block Code Protection bit (Boot block (000000-0007FFh) is not code-protected)
 #pragma config CPD = OFF        // Data EEPROM Code Protection bit (Data EEPROM is not code-protected)
 
+#ifdef LEGACY_LOC // Modified for LEGACY_LOC version.
+// CONFIG6L
+#pragma config WRT0 = OFF       // Write Protection bit (Block 0 (000800-001FFFh) is not write-protected)
+#pragma config WRT1 = OFF       // Write Protection bit (Block 1 (002000-003FFFh) is not write-protected)
+#if defined(_18F4550) || defined(_18F4553)
+#pragma config WRT2 = OFF       // Write Protection bit (Block 2 (004000-005FFFh) is not write-protected)
+#pragma config WRT3 = ON        // Write Protection bit (Block 3 (006000-007FFFh) is write-protected)
+#else
+#pragma config WRT2 = ON        // Write Protection bit (Block 2 (004000-005FFFh) is write-protected)
+#endif
+
+// CONFIG6H
+#pragma config WRTC = ON        // Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) are write-protected)
+#pragma config WRTB = OFF       // Boot Block Write Protection bit (Boot block (000000-0007FFh) is not write-protected)
+#pragma config WRTD = OFF       // Data EEPROM Write Protection bit (Data EEPROM is not write-protected)
+#else
 // CONFIG6L
 #pragma config WRT0 = ON        // Write Protection bit (Block 0 (000800-001FFFh) is write-protected)
 #pragma config WRT1 = OFF       // Write Protection bit (Block 1 (002000-003FFFh) is not write-protected)
 #pragma config WRT2 = OFF       // Write Protection bit (Block 2 (004000-005FFFh) is not write-protected)
-#if defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
+#if defined(_18F4550) || defined(_18F4553)
 #pragma config WRT3 = OFF       // Write Protection bit (Block 3 (006000-007FFFh) is not write-protected)
 #endif
 
@@ -208,12 +235,13 @@
 #pragma config WRTC = ON        // Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) are write-protected)
 #pragma config WRTB = ON        // Boot Block Write Protection bit (Boot block (000000-0007FFh) is write-protected)
 #pragma config WRTD = OFF       // Data EEPROM Write Protection bit (Data EEPROM is not write-protected)
+#endif
 
 // CONFIG7L
 #pragma config EBTR0 = OFF      // Table Read Protection bit (Block 0 (000800-001FFFh) is not protected from table reads executed in other blocks)
 #pragma config EBTR1 = OFF      // Table Read Protection bit (Block 1 (002000-003FFFh) is not protected from table reads executed in other blocks)
 #pragma config EBTR2 = OFF      // Table Read Protection bit (Block 2 (004000-005FFFh) is not protected from table reads executed in other blocks)
-#if defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
+#if defined(_18F4550) || defined(_18F4553)
 #pragma config EBTR3 = OFF      // Table Read Protection bit (Block 3 (006000-007FFFh) is not protected from table reads executed in other blocks)
 #endif
 
@@ -267,6 +295,16 @@
 #pragma config CPB = OFF        // Boot Block Code Protection bit (Boot block not code-protected)
 #pragma config CPD = OFF        // Data EEPROM Code Protection bit (Data EEPROM not code-protected)
 
+#ifdef LEGACY_LOC // Modified for LEGACY_LOC version.
+// CONFIG6L
+#pragma config WRT0 = OFF       // Table Write Protection bit (Block 0 not write-protected)
+#pragma config WRT1 = OFF       // Table Write Protection bit (Block 1 not write-protected)
+
+// CONFIG6H
+#pragma config WRTC = ON        // Configuration Register Write Protection bit (Configuration registers write-protected)
+#pragma config WRTB = OFF       // Boot Block Write Protection bit (Boot block not write-protected)
+#pragma config WRTD = OFF       // Data EEPROM Write Protection bit (Data EEPROM not write-protected)
+#else
 // CONFIG6L
 #pragma config WRT0 = ON        // Table Write Protection bit (Block 0 write-protected)
 #pragma config WRT1 = OFF       // Table Write Protection bit (Block 1 not write-protected)
@@ -275,6 +313,7 @@
 #pragma config WRTC = ON        // Configuration Register Write Protection bit (Configuration registers write-protected)
 #pragma config WRTB = ON        // Boot Block Write Protection bit (Boot block write-protected)
 #pragma config WRTD = OFF       // Data EEPROM Write Protection bit (Data EEPROM not write-protected)
+#endif
 
 // CONFIG7L
 #pragma config EBTR0 = OFF      // Table Read Protection bit (Block 0 not protected from table reads executed in other blocks)
@@ -284,7 +323,7 @@
 #pragma config EBTRB = OFF      // Boot Block Table Read Protection bit (Boot block not protected from table reads executed in other blocks)
 
 
-#elif defined(_18F24K50) || defined(_18F25K50) || defined(_18F45K50)
+#elif defined(_18F24K50) || defined(_18F45K50)
 // CONFIG1L
 #pragma config PLLSEL = PLL4X   // PLL Selection (4x clock multiplier)
 #pragma config CFGPLLEN = OFF   // PLL Enable Configuration bit (PLL Disabled (firmware controlled))
@@ -344,6 +383,22 @@
 #pragma config CPB = OFF        // Boot Block Code Protect (Boot block is not code-protected)
 #pragma config CPD = OFF        // Data EEPROM Code Protect (Data EEPROM is not code-protected)
 
+#ifdef LEGACY_LOC // Modified for LEGACY_LOC version.
+// CONFIG6L
+#pragma config WRT0 = OFF       // Block 0 Write Protect (Block 0 (0800-1FFFh) is not write-protected)
+#if !defined(_18F24K50)
+#pragma config WRT1 = OFF       // Block 1 Write Protect (Block 1 (2000-3FFFh) is not write-protected)
+#pragma config WRT2 = OFF       // Block 2 Write Protect (Block 2 (04000-5FFFh) is not write-protected)
+#pragma config WRT3 = ON        // Block 3 Write Protect (Block 3 (06000-7FFFh) is write-protected)
+#else
+#pragma config WRT1 = ON        // Block 1 Write Protect (Block 1 (2000-3FFFh) is write-protected)
+#endif
+
+// CONFIG6H
+#pragma config WRTC = ON        // Configuration Registers Write Protect (Configuration registers (300000-3000FFh) are write-protected)
+#pragma config WRTB = ON        // Boot Block Write Protect (Boot block (0000-7FFh) is write-protected)
+#pragma config WRTD = OFF       // Data EEPROM Write Protect (Data EEPROM is not write-protected)
+#else
 // CONFIG6L
 #pragma config WRT0 = ON        // Block 0 Write Protect (Block 0 (0800-1FFFh) is write-protected)
 #pragma config WRT1 = OFF       // Block 1 Write Protect (Block 1 (2000-3FFFh) is not write-protected)
@@ -356,6 +411,7 @@
 #pragma config WRTC = ON        // Configuration Registers Write Protect (Configuration registers (300000-3000FFh) are write-protected)
 #pragma config WRTB = ON        // Boot Block Write Protect (Boot block (0000-7FFh) is write-protected)
 #pragma config WRTD = OFF       // Data EEPROM Write Protect (Data EEPROM is not write-protected)
+#endif
 
 // CONFIG7L
 #pragma config EBTR0 = OFF      // Block 0 Table Read Protect (Block 0 is not protected from table reads executed in other blocks)
@@ -423,15 +479,28 @@
 #pragma config IOL1WAY = OFF    // IOLOCK One-Way Set Enable bit (The IOLOCK bit (PPSCON<0>) can be set and cleared as needed)
 #pragma config MSSP7B_EN = MSK7 // MSSP address masking (7 Bit address masking mode)
 
+#ifdef LEGACY_LOC // Modified for LEGACY_LOC version.
+// CONFIG4L
+#if defined(_18F44J50)
+#pragma config WPFP = PAGE_8    // Write/Erase Protect Page Start/End Location (Write Protect Program Flash Page 8)
+#elif defined(_18F45J50)
+#pragma config WPFP = PAGE_24   // Write/Erase Protect Page Start/End Location (Write Protect Program Flash Page 24)
+#elif defined(_18F46J50)
+#pragma config WPFP = PAGE_56   // Write/Erase Protect Page Start/End Location (Write Protect Program Flash Page 56)
+#endif
+#pragma config WPEND = PAGE_WPFP// Write/Erase Protect Region Select (valid when WPDIS = 0) (Page WPFP<5:0> through Configuration Words erase/write protected)
+#pragma config WPCFG = ON       // Write/Erase Protect Configuration Region (Configuration Words page erase/write-protected)
+#else
 // CONFIG4L
 #pragma config WPFP = PAGE_7    // Write/Erase Protect Page Start/End Location (Write Protect Program Flash Page 7)
 #pragma config WPEND = PAGE_0   // Write/Erase Protect Region Select (valid when WPDIS = 0) (Page 0 through WPFP<5:0> erase/write protected)
 #pragma config WPCFG = ON       // Write/Erase Protect Configuration Region (Configuration Words page erase/write-protected)
+#endif
 
 // CONFIG4H
 #pragma config WPDIS = ON       // Write Protect Disable bit (WPFP<5:0>/WPEND region erase/write protected)
 
-#elif defined(_18F26J53) || defined(_18F46J53) || defined(_18F27J53) || defined(_18F47J53)
+#elif defined(_18F46J53) || defined(_18F47J53)
 //#elif defined(_18F47J53_FAMILY_) // Doesn't work!
 // CONFIG1L
 #pragma config WDTEN = OFF      // Watchdog Timer (Disabled - Controlled by SWDTEN bit)
@@ -488,6 +557,20 @@
 #pragma config ADCSEL = BIT12   // ADC 10 or 12 Bit Select (12 - Bit ADC Enabled)
 #pragma config MSSP7B_EN = MSK7 // MSSP address masking (7 Bit address masking mode)
 
+#ifdef LEGACY_LOC // Modified for LEGACY_LOC version.
+// CONFIG4L
+#if defined(_18F46J53)
+#pragma config WPFP = PAGE_56   // Write/Erase Protect Page Start/End Location (Write Protect Program Flash Page 56)
+#else
+#pragma config WPFP = PAGE_120  // Write/Erase Protect Page Start/End Location (Write Protect Program Flash Page 120)
+#endif
+#pragma config WPCFG = ON       // Write/Erase Protect Configuration Region  (Configuration Words page erase/write-protected)
+
+// CONFIG4H
+#pragma config WPDIS = ON       // Write Protect Disable bit (WPFP<6:0>/WPEND region erase/write protected)
+#pragma config WPEND = PAGE_WPFP// Write/Erase Protect Region Select bit (valid when WPDIS = 0) (Pages WPFP<6:0> through Configuration Words erase/write protected)
+#pragma config LS48MHZ = SYS48X8// Low Speed USB mode with 48 MHz system clock bit (System clock at 48 MHz USB CLKEN divide-by is set to 8)
+#else
 // CONFIG4L
 #pragma config WPFP = PAGE_7    // Write/Erase Protect Page Start/End Location (Write Protect Program Flash Page 7)
 #pragma config WPCFG = ON       // Write/Erase Protect Configuration Region  (Configuration Words page erase/write-protected)
@@ -496,6 +579,7 @@
 #pragma config WPDIS = ON       // Write Protect Disable bit (WPFP<6:0>/WPEND region erase/write protected)
 #pragma config WPEND = PAGE_0   // Write/Erase Protect Region Select bit (valid when WPDIS = 0) (Pages 0 through WPFP<6:0> erase/write protected)
 #pragma config LS48MHZ = SYS48X8// Low Speed USB mode with 48 MHz system clock bit (System clock at 48 MHz USB CLKEN divide-by is set to 8)
+#endif
 #endif
 
 #include <xc.h>

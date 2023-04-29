@@ -39,26 +39,41 @@
 #include "bootloader.h"
 #include "flash.h"
 
+#ifdef LEGACY_LOC
 #if defined(_PIC14E)
 // Force to keep unused functions outside of ROM range.
 __asm("GLOBAL _reset_vect");
 
-void reset_vect(void) __at(FLASH_START)
+void reset_vect(void) __at(PROG_REGION_START)
 {
     __asm("PAGESEL "___mkstr(BOOT_REGION_START / 2));
     __asm("GOTO "___mkstr(BOOT_REGION_START / 2));
     __asm("MOVWI -1[FSR1]");
     __asm("MOVWI -1[FSR1]");
-    __asm("PAGESEL "___mkstr((PROG_REGION_START + 0x08) / 2));
-    __asm("GOTO "___mkstr((PROG_REGION_START + 0x08) / 2));
+    __asm("PAGESEL "___mkstr((PROG_OFFSET + 0x08) / 2));
+    __asm("GOTO "___mkstr((PROG_OFFSET + 0x08) / 2));
 
 }
 #else
 #define ASM_GOTO(x) (0xF000EF00 | (x & 0x000000FF) | ((x & 0x000FFF00) << 8))
 
-const uint32_t reset_vect  __at(FLASH_START)        = ASM_GOTO(BOOT_REGION_START / 2);
-const uint32_t int_hi_vect __at(FLASH_START + 0x08) = ASM_GOTO((PROG_REGION_START + 0x8) / 2);
-const uint32_t int_lo_vect __at(FLASH_START + 0x18) = ASM_GOTO((PROG_REGION_START + 0x18) / 2);
+const uint32_t reset_vect  __at(PROG_REGION_START)        = ASM_GOTO(BOOT_REGION_START / 2);
+const uint32_t int_hi_vect __at(PROG_REGION_START + 0x08) = ASM_GOTO((PROG_OFFSET + 0x8) / 2);
+const uint32_t int_lo_vect __at(PROG_REGION_START + 0x18) = ASM_GOTO((PROG_OFFSET + 0x18) / 2);
+#endif
+#else
+#if defined(_PIC14E)	
+__asm("GLOBAL _isr");	
+void isr(void) __at(0x4)	
+{	
+    __asm("LJMP "___mkstr(((PROG_REGION_START / 2) + 0x4)));	
+}	
+#else	
+__asm("PSECT intcode");	
+__asm("goto    "___mkstr(PROG_REGION_START + 0x08));	
+__asm("PSECT intcodelo");	
+__asm("goto    "___mkstr(PROG_REGION_START + 0x18));	
+#endif
 #endif
 
 static void inline boot_init(void);
@@ -68,8 +83,6 @@ static void check_user_first_inst(void);
 bool user_firmware = false;
 
 static uint8_t m_delay_cnt = 0;
-
-
 
 void main(void)
 {
@@ -99,9 +112,9 @@ void main(void)
     // User firmware detected.
     boot_uninit();
     #if defined(_PIC14E)
-    __asm("LJMP "___mkstr(PROG_REGION_START / 2));
+    __asm("LJMP "___mkstr((PROG_REGION_START + PROG_OFFSET) / 2));
     #else
-    __asm("GOTO " ___mkstr(PROG_REGION_START));
+    __asm("GOTO " ___mkstr(PROG_REGION_START + PROG_OFFSET));
     #endif
     
     // Button was pushed while in bootloader.
@@ -320,7 +333,7 @@ static void check_user_first_inst(void)
 {
 #if defined(_PIC14E)
     PMCON1 = 0;
-    PMADR = (PROG_REGION_START / 2);
+    PMADR = ((PROG_REGION_START + PROG_OFFSET) / 2);
     PMCON1bits.RD = 1;
     __asm("NOP");
     __asm("NOP");
@@ -329,7 +342,7 @@ static void check_user_first_inst(void)
 #else
     uint8_t inst[2];
     EECON1 = 0x80;
-    TBLPTR = PROG_REGION_START;
+    TBLPTR = PROG_REGION_START + PROG_OFFSET;
     __asm("TBLRDPOSTINC");
     inst[0] = TABLAT;
     __asm("TBLRDPOSTINC");

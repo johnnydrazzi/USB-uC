@@ -22,6 +22,21 @@
 #ifndef BOOTLOADER_H
 #define BOOTLOADER_H
 
+// Bootloader Location:
+//#define LEGACY_LOC // Uncomment to place the bootloader at the end of flash
+                   // memory, and user code at the start. This is for
+                   // compatibility with compilers that need this arrangement
+                   // only, e.g. Great Cow Basic, otherwise not recommended. 
+                   // The first instructions in flash memory are the 
+                   // "go to bootloader" and "go to interrupt" instructions.
+                   // These are in the user region of memory and therefore not
+                   // write-protected. Although the bootloader takes care not
+                   // to overwrite these instructions when in bootloader mode,
+                   // there is nothing preventing the user from writing code
+                   // that accidently writes over these instructions. It's not
+                   // recommended to write code that writes to flash memory
+                   // when using this version of the bootloader.
+
 /* Emulated FAT16 File System
              ______________
     0x00000 |              |
@@ -36,7 +51,6 @@
     0x02600 |              |
             |  DATA SECT   | 0x200000 (2MB)
    0x2025FF |______________|
-
  */
 
 /* PIC16F145X ROM Space
@@ -234,45 +248,52 @@
 #include <xc.h>
 #include "config.h"
 
-#if defined(_PIC14E)
-// _FLASH_WRITE_SIZE is in words (14bits), double to be in bytes.
-#define FLASH_WRITE_SIZE _FLASH_WRITE_SIZE * 2
-#else
-#define FLASH_WRITE_SIZE  _FLASH_WRITE_SIZE
-#endif
-
-#define FLASH_START           0x00000
-
 // Memory Regions.
 #if defined(_PIC14E)
-#define BOOT_REGION_START     0x02000
-#define PROG_REGION_START     0x00010
-#define PROG_REGION_END       BOOT_REGION_START
+#define END_OF_FLASH          0x04000
 #define CONFIG_REGION_START   0x10000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
 #define CONFIG_PAGE_START     CONFIG_REGION_START
 #define DEV_ID_START          0x1000C
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x02000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00010
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       END_OF_FLASH
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x2000 // In bytes
 
-#elif defined(_18F2450) || defined(_18F4450)
-#define BOOT_REGION_START     0x02000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#elif defined(_18F4450)
+#define END_OF_FLASH          0x04000
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
 #define CONFIG_PAGE_START     CONFIG_REGION_START
 #define DEV_ID_START          0x3FFFFE
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x02000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       END_OF_FLASH
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x2000 // In bytes
 
-#elif defined(_18F2455) || defined(_18F4455) || defined(_18F2458) || defined(_18F4458)
-#define BOOT_REGION_START     0x04000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#elif defined(_18F4455) || defined(_18F4458)
+#define END_OF_FLASH          0x06000
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -281,14 +302,23 @@
 #define EEPROM_REGION_START   0xF00000
 #define END_OF_EEPROM         0xF00100
 #define EEPROM_SIZE           0x100
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x04000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       END_OF_FLASH
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x4000 // In bytes
 
-#elif defined(_18F2550) || defined(_18F4550) || defined(_18F2553) || defined(_18F4553)
-#define BOOT_REGION_START     0x06000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#elif defined(_18F4550) || defined(_18F4553)
+#define END_OF_FLASH          0x08000
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -297,14 +327,23 @@
 #define EEPROM_REGION_START   0xF00000
 #define END_OF_EEPROM         0xF00100
 #define EEPROM_SIZE           0x100
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x06000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       END_OF_FLASH
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x6000 // In bytes
 
 #elif defined(_18F14K50) || defined(_18F24K50)
-#define BOOT_REGION_START     0x02000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#define END_OF_FLASH          0x04000
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -313,14 +352,23 @@
 #define EEPROM_REGION_START   0xF00000
 #define END_OF_EEPROM         0xF00100
 #define EEPROM_SIZE           0x100
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x02000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       END_OF_FLASH
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x2000 // In bytes
 
-#elif defined(_18F25K50) || defined(_18F45K50)
-#define BOOT_REGION_START     0x06000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#elif defined(_18F45K50)
+#define END_OF_FLASH          0x08000
 #define ID_REGION_START       0x200000
 #define CONFIG_REGION_START   0x300000
 #define CONFIG_BLOCK_REGION   CONFIG_REGION_START
@@ -329,58 +377,101 @@
 #define EEPROM_REGION_START   0xF00000
 #define END_OF_EEPROM         0xF00100
 #define EEPROM_SIZE           0x100
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x06000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       END_OF_FLASH
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x6000 // In bytes
 
-#elif defined(_18F24J50) || defined(_18F44J50)
-#define BOOT_REGION_START     0x02000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#elif defined(_18F44J50)
+#define END_OF_FLASH          0x04000
 #define CONFIG_BLOCK_REGION   0x03FC0
 #define CONFIG_REGION_START   0x03FF8
 #define CONFIG_PAGE_START     0x03C00
-#define END_OF_FLASH          0x04000
 #define DEV_ID_START          0x3FFFFE
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x02000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       CONFIG_PAGE_START
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x02000 // In bytes
 
-#elif defined(_18F25J50) || defined(_18F45J50)
-#define BOOT_REGION_START     0x06000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#elif defined(_18F45J50)
+#define END_OF_FLASH          0x08000
 #define CONFIG_BLOCK_REGION   0x07FC0
 #define CONFIG_REGION_START   0x07FF8
 #define CONFIG_PAGE_START     0x07C00
-#define END_OF_FLASH          0x08000
 #define DEV_ID_START          0x3FFFFE
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x06000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       CONFIG_PAGE_START
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x06000 // In bytes
 
-#elif defined(_18F26J50) || defined(_18F46J50) || defined(_18F26J53) || defined(_18F46J53)
-#define BOOT_REGION_START     0x0E000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#elif defined(_18F46J50) || defined(_18F46J53)
+#define END_OF_FLASH          0x10000
 #define CONFIG_BLOCK_REGION   0x0FFC0
 #define CONFIG_REGION_START   0x0FFF8
 #define CONFIG_PAGE_START     0x0FC00
-#define END_OF_FLASH          0x10000
 #define DEV_ID_START          0x3FFFFE
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x0E000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       CONFIG_PAGE_START
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x0E000 // In bytes
 
-#elif defined(_18F27J53) || defined(_18F47J53)
-#define BOOT_REGION_START     0x1E000
-#define PROG_REGION_START     0x00020
-#define PROG_REGION_END       BOOT_REGION_START
+#elif defined(_18F47J53)
+#define END_OF_FLASH          0x20000
 #define CONFIG_BLOCK_REGION   0x1FFC0
 #define CONFIG_REGION_START   0x1FFF8
 #define CONFIG_PAGE_START     0x1FC00
-#define END_OF_FLASH          0x20000
 #define DEV_ID_START          0x3FFFFE
+#ifdef LEGACY_LOC
+#define BOOT_REGION_START     0x1E000
+#define PROG_REGION_START     0x00000
+#define PROG_OFFSET           0x00020
+#define PROG_REGION_END       BOOT_REGION_START
+#else
+#define BOOT_REGION_START     0x00000	
+#define PROG_REGION_START     0x02000
+#define PROG_OFFSET           0x00000
+#define PROG_REGION_END       CONFIG_PAGE_START
+#endif
 
 // FLASH USER SPACE
 #define FILE_SIZE 0x1E000 // In bytes

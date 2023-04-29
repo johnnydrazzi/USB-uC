@@ -29,13 +29,20 @@
 #include "flash.h"
 #include "EEPROM.h"
 
+#if defined(_PIC14E)
+// _FLASH_WRITE_SIZE is in words (14bits), double to be in bytes.
+#define FLASH_WRITE_SIZE (_FLASH_WRITE_SIZE * 2)
+#else
+#define FLASH_WRITE_SIZE  _FLASH_WRITE_SIZE
+#endif
+
 #define INDEX_MASK (((uint24_t)FLASH_WRITE_SIZE) - 1)
 #define FLASH_ADDR_MASK ~INDEX_MASK
 
 bool g_boot_reset;
 
 static uint8_t  m_flash_block[FLASH_WRITE_SIZE];
-static uint24_t m_prev_flash_addr = 0;
+static uint24_t m_prev_flash_addr = PROG_REGION_START;
 static uint8_t  m_prev_block_index = 0;
 
 extern bool     user_firmware;
@@ -56,10 +63,12 @@ static bool update_erase_block(uint24_t address, uint8_t* data, uint8_t cnt)
     uint8_t  block_index = address & INDEX_MASK;
     uint24_t flash_addr  = address & FLASH_ADDR_MASK;
     
+    #ifdef LEGACY_LOC
     #if defined(_PIC14E)
     if(flash_addr == 0 && block_index < 16) return false; // This is a protected area, user must have not applied an offset.
     #else
     if(flash_addr == 0 && block_index < 32) return false; // This is a protected area, user must have not applied an offset.
+    #endif
     #endif
 
     if((flash_addr != m_prev_flash_addr) && (m_prev_block_index != 0)) // If new block
@@ -545,71 +554,64 @@ static bool hex_char_to_char(uint8_t* chr)
 
 static void delete_file(void)
 {
-#if defined(_PIC14E)
-    // Preserve first 8 instructions
-    usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block));
-    Flash_ReadBytes(FLASH_START, 16, m_flash_block);
-    
-    Flash_Erase(FLASH_START, PROG_REGION_END / 2);
-    
-    // Restore first 8 instructions
-    Flash_WriteBlock(FLASH_START, m_flash_block);
-#elif (__J_PART)
+#ifdef LEGACY_LOC
     // Preserve instructions
     usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block));
-    Flash_ReadBytes(FLASH_START, 32, m_flash_block);
-    
-    Flash_Erase(FLASH_START, PROG_REGION_END);
-    
+    #if defined(_PIC14E)
+    Flash_ReadBytes(PROG_REGION_START, 16, m_flash_block);
+    Flash_Erase(PROG_REGION_START, PROG_REGION_END / 2);
+    #else
+    Flash_ReadBytes(PROG_REGION_START, 32, m_flash_block);
+    Flash_Erase(PROG_REGION_START, PROG_REGION_END);
+    #endif
     // Restore instructions
-    Flash_WriteBlock(FLASH_START, m_flash_block);
+    Flash_WriteBlock(PROG_REGION_START, m_flash_block);
 #else
-    // Preserve instructions
-    usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block));
-    Flash_ReadBytes(FLASH_START, 32, m_flash_block);
-    
-    Flash_Erase(FLASH_START, PROG_REGION_END);
-    
-    // Restore instructions
-    Flash_WriteBlock(FLASH_START, m_flash_block);
+    #if defined(_PIC14E)	
+    Flash_Erase(PROG_REGION_START / 2, PROG_REGION_END / 2);	
+    #else	
+    Flash_Erase(PROG_REGION_START, PROG_REGION_END);	
+    #endif
 #endif
 }
 
 static bool safely_write_block(uint24_t start_addr)
 {
+    //uint8_t i;
 #if defined(_PIC14E)
-    if(start_addr == FLASH_START)
+    #ifdef LEGACY_LOC
+    if(start_addr == PROG_REGION_START)
     {
-        // Preserve first 8 instructions
-        Flash_ReadBytes(FLASH_START, 16, m_flash_block);
+        // Preserve instructions
+        Flash_ReadBytes(PROG_REGION_START, 16, m_flash_block);
         Flash_WriteBlock(start_addr / 2, m_flash_block);
     }
     else if(start_addr < PROG_REGION_END) Flash_WriteBlock(start_addr / 2, m_flash_block);
     else if(start_addr == CONFIG_REGION_START){}
-    else return false;
-    return true;
-#elif defined(__J_PART)
-    if(start_addr == FLASH_START)
-    {
-        // Preserve instructions
-        Flash_ReadBytes(FLASH_START, 32, m_flash_block);
-        Flash_WriteBlock(start_addr, m_flash_block);
-    }
-    if(start_addr < PROG_REGION_END) Flash_WriteBlock(start_addr, m_flash_block);
-    else if(start_addr < END_OF_FLASH){}      
+    #else
+    if((start_addr < PROG_REGION_END) && (start_addr >= PROG_REGION_START)) Flash_WriteBlock(start_addr / 2, m_flash_block);
+    else if(start_addr == CONFIG_REGION_START){}
+    #endif
     else return false;
     return true;
 #else
-    uint8_t i;
-    if(start_addr == FLASH_START)
+    #ifdef LEGACY_LOC
+    if(start_addr == PROG_REGION_START)
     {
         // Preserve instructions
-        Flash_ReadBytes(FLASH_START, 32, m_flash_block);
+        Flash_ReadBytes(PROG_REGION_START, 32, m_flash_block);
         Flash_WriteBlock(start_addr, m_flash_block);
     }
     else if(start_addr < PROG_REGION_END) Flash_WriteBlock(start_addr, m_flash_block);
+    #else
+    if((start_addr < PROG_REGION_END) && (start_addr >= PROG_REGION_START)) Flash_WriteBlock(start_addr, m_flash_block);
+    #endif
+    #if defined(__J_PART)
+    else if((start_addr < END_OF_FLASH) && (start_addr >= CONFIG_PAGE_START)){}
+    #else
     else if(start_addr == ID_REGION_START){}
     else if(start_addr == CONFIG_REGION_START){}
+    #endif
     #ifdef HAS_EEPROM
     else if((start_addr < END_OF_EEPROM) && (start_addr >= EEPROM_REGION_START))
     {
@@ -617,7 +619,6 @@ static bool safely_write_block(uint24_t start_addr)
         for(i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
     }
     #endif
-    else if(start_addr < END_OF_FLASH){}
     else return false;
     return true;
 #endif
@@ -626,7 +627,7 @@ static bool safely_write_block(uint24_t start_addr)
 #ifndef SIMPLE_BOOTLOADER
 static uint32_t LBA_to_flash_addr(uint32_t LBA)
 {
-    return ((LBA - PROG_MEM_SECT_ADDR) << 9) + FLASH_START + g_msd_byte_of_sect;
+    return ((LBA - PROG_MEM_SECT_ADDR) << 9) + PROG_REGION_START + g_msd_byte_of_sect;
 }
 #endif
 

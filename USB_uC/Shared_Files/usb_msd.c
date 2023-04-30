@@ -2,10 +2,10 @@
  * @file usb_msd.c
  * @brief Contains <i>Mass Storage Class</i> functions.
  * @author John Izzard
- * @date 20/04/2021
+ * @date 30/04/2023
  * 
  * USB uC - MSD Library.
- * Copyright (C) 2017-2021  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -293,7 +293,7 @@ void msd_arm_ep_out(uint8_t bdt_index)
     g_usb_bd_table[bdt_index].STAT     |= _UOWN;
 }
 
-void msd_arm_ep_in(uint8_t bdt_index, uint16_t cnt)
+void msd_arm_ep_in(uint8_t bdt_index, uint8_t cnt)
 {
     if(g_usb_ep_stat[MSD_EP][IN].Data_Toggle_Val) g_usb_bd_table[bdt_index].STAT = _DTSEN | _DTS; // DATA1
     else g_usb_bd_table[bdt_index].STAT = _DTSEN; // DATA0
@@ -310,7 +310,7 @@ void msd_arm_ep_out(void)
     g_usb_bd_table[MSD_BD_OUT].STAT     |= _UOWN;
 }
 
-void msd_arm_ep_in(uint16_t cnt)
+void msd_arm_ep_in(uint8_t cnt)
 {
     if(g_usb_ep_stat[MSD_EP][IN].Data_Toggle_Val) g_usb_bd_table[MSD_BD_IN].STAT = _DTSEN | _DTS; // DATA1
     else g_usb_bd_table[MSD_BD_IN].STAT = _DTSEN; // DATA0
@@ -724,7 +724,7 @@ static void service_cbw(void)
                 g_msd_ep_in[12] = g_msd_additional_sense_code;
                 g_msd_ep_in[13] = g_msd_additional_sense_code_qualifier;
                 #endif
-                send_data_response(g_msd_bytes_to_transfer.val);
+                send_data_response((uint8_t)g_msd_bytes_to_transfer.val);
                 return;
             }
             check_13_cases(0, Dn);
@@ -739,11 +739,11 @@ static void service_cbw(void)
             {
                 if(g_msd_bytes_to_transfer.val > 36) g_msd_bytes_to_transfer.val = 36;
                 #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-                usb_rom_copy((const uint8_t*)&g_scsi_inquiry, in_ep_addr, g_msd_bytes_to_transfer.val);
+                usb_rom_copy((const uint8_t*)&g_scsi_inquiry, in_ep_addr, (uint8_t)g_msd_bytes_to_transfer.val);
                 #else
-                usb_rom_copy((const uint8_t*)&g_scsi_inquiry, g_msd_ep_in, g_msd_bytes_to_transfer.val);
+                usb_rom_copy((const uint8_t*)&g_scsi_inquiry, g_msd_ep_in, (uint8_t)g_msd_bytes_to_transfer.val);
                 #endif
-                send_data_response(g_msd_bytes_to_transfer.val);
+                send_data_response((uint8_t)g_msd_bytes_to_transfer.val);
                 return;
             } 
             check_13_cases(0, Dn);
@@ -771,9 +771,9 @@ static void service_cbw(void)
                 g_msd_mode_sense.DEVICE_SPECIFIC_PARAMETER = 0x00; // 0x00 for R/W, 0x80 for R-only
                 g_msd_mode_sense.BLOCK_DESCRIPTOR_LENGTH   = 0x00;
                 #if PINGPONG_MODE == PINGPONG_1_15 || PINGPONG_MODE == PINGPONG_ALL_EP
-                usb_ram_copy((uint8_t*)&g_msd_mode_sense, in_ep_addr, g_msd_bytes_to_transfer.val);
+                usb_ram_copy((uint8_t*)&g_msd_mode_sense, in_ep_addr, (uint8_t)g_msd_bytes_to_transfer.val);
                 #endif
-                send_data_response(g_msd_bytes_to_transfer.val);
+                send_data_response((uint8_t)g_msd_bytes_to_transfer.val);
                 return;
             }
             check_13_cases(0, Dn);

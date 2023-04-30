@@ -2,10 +2,10 @@
  * @file usb.c
  * @brief Contains the USB stack core variables and  functions.
  * @author John Izzard
- * @date 05/06/2020
+ * @date 30/04/2023
  * 
  * USB uC - USB Stack.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -429,7 +429,7 @@ void usb_tasks(void)
     }
 }
     
-void usb_arm_endpoint(bd_t* p_bd, usb_ep_stat_t* p_ep_stat, uint16_t buffer_addr, uint16_t cnt)
+void usb_arm_endpoint(bd_t* p_bd, usb_ep_stat_t* p_ep_stat, uint16_t buffer_addr, uint8_t cnt)
 {
     if(p_ep_stat->Data_Toggle_Val) p_bd->STAT = _DTSEN | _DTS; // DATA1
     else p_bd->STAT = _DTSEN; // DATA0
@@ -515,9 +515,9 @@ void usb_in_control_transfer(void)
         }
         else
         {
-            if(g_usb_sending_from == ROM) usb_rom_copy((const uint8_t*)((uint16_t)g_usb_rom_ptr), p_ep, g_usb_bytes_2_send);
-            else usb_ram_copy((uint8_t*)((uint16_t)g_usb_ram_ptr), p_ep, g_usb_bytes_2_send);
-            usb_arm_ep0_in(bd_table_index, g_usb_bytes_2_send);
+            if(g_usb_sending_from == ROM) usb_rom_copy((const uint8_t*)((uint16_t)g_usb_rom_ptr), p_ep, (uint8_t)g_usb_bytes_2_send);
+            else usb_ram_copy((uint8_t*)((uint16_t)g_usb_ram_ptr), p_ep, (uint8_t)g_usb_bytes_2_send);
+            usb_arm_ep0_in(bd_table_index, (uint8_t)g_usb_bytes_2_send);
             g_usb_bytes_2_send = 0;
         }
     }
@@ -549,9 +549,9 @@ void usb_in_control_transfer(void)
         }
         else
         {
-            if(g_usb_sending_from == ROM) usb_rom_copy((const uint8_t*)((uint16_t)g_usb_rom_ptr), m_ep0_in, g_usb_bytes_2_send);
-            else usb_ram_copy((uint8_t*)((uint16_t)g_usb_ram_ptr), m_ep0_in, g_usb_bytes_2_send);
-            usb_arm_ep0_in(g_usb_bytes_2_send);
+            if(g_usb_sending_from == ROM) usb_rom_copy((const uint8_t*)((uint16_t)g_usb_rom_ptr), m_ep0_in, (uint8_t)g_usb_bytes_2_send);
+            else usb_ram_copy((uint8_t*)((uint16_t)g_usb_ram_ptr), m_ep0_in, (uint8_t)g_usb_bytes_2_send);
+            usb_arm_ep0_in((uint8_t)g_usb_bytes_2_send);
             g_usb_bytes_2_send = 0;
         }
     }
@@ -578,8 +578,8 @@ void usb_out_control_transfer(void)
     }
     else
     {
-        if(PINGPONG_PARITY == EVEN) usb_ram_copy(m_ep0_out_even, g_usb_ram_ptr, g_usb_bytes_2_recv);
-        else usb_ram_copy(m_ep0_out_odd, g_usb_ram_ptr, g_usb_bytes_2_recv);
+        if(PINGPONG_PARITY == EVEN) usb_ram_copy(m_ep0_out_even, g_usb_ram_ptr, (uint8_t)g_usb_bytes_2_recv);
+        else usb_ram_copy(m_ep0_out_odd, g_usb_ram_ptr, (uint8_t)g_usb_bytes_2_recv);
         g_usb_ram_ptr += EP0_SIZE;
         g_usb_bytes_2_recv = 0;
     }
@@ -592,7 +592,7 @@ void usb_out_control_transfer(void)
     }
     else
     {
-        usb_ram_copy(m_ep0_out, g_usb_ram_ptr, g_usb_bytes_2_recv);
+        usb_ram_copy(m_ep0_out, g_usb_ram_ptr, (uint8_t)g_usb_bytes_2_recv);
         g_usb_ram_ptr += g_usb_bytes_2_recv;
         g_usb_bytes_2_recv = 0;
     }
@@ -1021,7 +1021,7 @@ static void set_clear_feature(void)
 
 static void set_address(void)
 {
-    m_saved_address  = m_set_address.DeviceAddress;
+    m_saved_address  = (uint8_t)m_set_address.DeviceAddress;
     m_update_address = true;
     usb_arm_in_status();
     m_control_stage  = STATUS_IN_STAGE;
@@ -1145,7 +1145,7 @@ static void set_configuration(void)
         usb_arm_in_status();
         m_control_stage = STATUS_IN_STAGE;
         
-        m_current_configuration = g_usb_set_configuration.ConfigurationValue;      
+        m_current_configuration = (uint8_t)g_usb_set_configuration.ConfigurationValue;      
 
         if(m_current_configuration)
         {
@@ -1207,7 +1207,7 @@ static void get_interface(void)
     
 static void set_interface(void)
 {
-    if(usb_app_set_interface(g_usb_set_interface.AlternateSetting, g_usb_set_interface.Interface))
+    if(usb_app_set_interface((uint8_t)g_usb_set_interface.AlternateSetting, g_usb_set_interface.Interface))
     {
         usb_arm_in_status();
     }

@@ -616,7 +616,7 @@ static bool safely_write_block(uint24_t start_addr)
     else if((start_addr < END_OF_EEPROM) && (start_addr >= EEPROM_REGION_START))
     {
         start_addr &= 0xFF;
-        for(i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
+        for(uint8_t i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
     }
     #endif
     else return false;

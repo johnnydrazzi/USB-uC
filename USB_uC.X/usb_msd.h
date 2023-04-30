@@ -2,10 +2,10 @@
  * @file usb_msd.h
  * @brief <i>Mass Storage Class</i> core header.
  * @author John Izzard
- * @date 21/04/2021
+ * @date 30/04/2023
  * 
  * USB uC - MSD Library.
- * Copyright (C) 2017-2021  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -388,7 +388,7 @@ void msd_clear_ep_toggle(void);
 void msd_arm_ep_out(uint8_t bdt_index);
 
 /**
- * @fn void msd_arm_ep_in(uint8_t bdt_index, uint16_t cnt)
+ * @fn void msd_arm_ep_in(uint8_t bdt_index, uint8_t cnt)
  * 
  * @brief Arms MSD EP IN Endpoint for a transaction.
  * 
@@ -404,7 +404,7 @@ void msd_arm_ep_out(uint8_t bdt_index);
  * @endcode
  * </li></ul>
  */
-void msd_arm_ep_in(uint8_t bdt_index, uint16_t cnt);
+void msd_arm_ep_in(uint8_t bdt_index, uint8_t cnt);
 
 #else
 /**
@@ -424,7 +424,7 @@ void msd_arm_ep_in(uint8_t bdt_index, uint16_t cnt);
 void msd_arm_ep_out(void);
 
 /**
- * @fn void msd_arm_ep_in(uint16_t cnt)
+ * @fn void msd_arm_ep_in(uint8_t cnt)
  * 
  * @brief Arms MSD EP IN Endpoint for a transaction.
  * 
@@ -439,7 +439,7 @@ void msd_arm_ep_out(void);
  * @endcode
  * </li></ul>
  */
-void msd_arm_ep_in(uint16_t cnt);
+void msd_arm_ep_in(uint8_t cnt);
 #endif
 
 /**

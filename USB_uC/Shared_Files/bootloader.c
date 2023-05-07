@@ -272,7 +272,8 @@ void boot_process_read(void)
         {
             // Convert from LBA address space to flash address space.
             uint24_t addr = LBA_to_flash_addr(g_msd_rw_10_vars.LBA);
-            if(addr < PROG_REGION_END) // If address is in flash space.
+            //***************REVERT******************if(addr < PROG_REGION_END) // If address is in flash space.
+            if(addr < END_OF_FLASH) // If address is in flash space.
             {
                 // Read flash into g_msd_ep_in buffer.
                 #if defined(_PIC14E)
@@ -607,7 +608,8 @@ static bool safely_write_block(uint24_t start_addr)
     if((start_addr < PROG_REGION_END) && (start_addr >= PROG_REGION_START)) Flash_WriteBlock(start_addr, m_flash_block);
     #endif
     #if defined(__J_PART)
-    else if((start_addr < END_OF_FLASH) && (start_addr >= CONFIG_PAGE_START)){}
+    //*********REVERT*********else if((start_addr < END_OF_FLASH) && (start_addr >= CONFIG_PAGE_START)){}
+    else if(start_addr < END_OF_FLASH){}
     #else
     else if(start_addr == ID_REGION_START){}
     else if(start_addr == CONFIG_REGION_START){}

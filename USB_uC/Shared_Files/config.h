@@ -347,7 +347,7 @@
 #define LED_TRIS          TRISA
 
 #elif BOARD_VERSION == DEV_BOARD
-#define XTAL_USED         MHz_12
+#define XTAL_USED         MHz_16
 #define BUTTON_PORT_BIT   6
 #define BUTTON_PORT       PORTB
 #define USE_BOOT_LED

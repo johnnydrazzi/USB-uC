@@ -592,6 +592,7 @@ static bool safely_write_block(uint24_t start_addr)
     #else
     if((start_addr < PROG_REGION_END) && (start_addr >= PROG_REGION_START)) Flash_WriteBlock(start_addr / 2, m_flash_block);
     else if(start_addr == CONFIG_REGION_START){}
+    else if(start_addr < PROG_REGION_START){} //****** REVERT ******* (remove)
     #endif
     else return false;
     return true;

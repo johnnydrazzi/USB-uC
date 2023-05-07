@@ -578,7 +578,7 @@ static void delete_file(void)
 
 static bool safely_write_block(uint24_t start_addr)
 {
-    //uint8_t i;
+    uint8_t i; // ******** Revert (remove)
 #if defined(_PIC14E)
     #ifdef LEGACY_LOC
     if(start_addr == PROG_REGION_START)
@@ -619,9 +619,11 @@ static bool safely_write_block(uint24_t start_addr)
     else if((start_addr < END_OF_EEPROM) && (start_addr >= EEPROM_REGION_START))
     {
         start_addr &= 0xFF;
-        for(uint8_t i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
+        // *****REVERT*******for(uint8_t i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
+        for(i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
     }
     #endif
+    else if(start_addr < PROG_REGION_START){} // ******** Revert (remove)
     else return false;
     return true;
 #endif

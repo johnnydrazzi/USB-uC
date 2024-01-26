@@ -15,6 +15,7 @@
             <sourceRootList>
                 <sourceRootElem>../Shared_Files</sourceRootElem>
                 <sourceRootElem>.</sourceRootElem>
+                <sourceRootElem>../USB-Stack/USB_Stack/USB</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

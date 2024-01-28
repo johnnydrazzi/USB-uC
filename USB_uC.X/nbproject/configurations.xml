@@ -740,7 +740,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -945,7 +945,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -1089,7 +1089,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -1794,7 +1794,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -2560,7 +2560,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -3326,7 +3326,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -4092,7 +4092,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -4858,7 +4858,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -5624,7 +5624,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -6390,7 +6390,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -7156,7 +7156,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -7922,7 +7922,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -8688,7 +8688,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -9459,7 +9459,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -9750,7 +9750,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -10460,7 +10460,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -10775,7 +10775,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -10982,7 +10982,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -11126,7 +11126,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -11270,7 +11270,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -11414,7 +11414,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -11558,7 +11558,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -11702,7 +11702,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -11846,7 +11846,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -11990,7 +11990,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -12239,7 +12239,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>
@@ -12528,7 +12528,7 @@
         <property key="advanced-elf" value="true"/>
         <property key="constdata-progmem" value="true"/>
         <property key="gcc-opt-driver-new" value="true"/>
-        <property key="gcc-opt-std" value="-std=c90"/>
+        <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
         <property key="mapped-progmem" value="false"/>
         <property key="omit-pack-options" value="false"/>

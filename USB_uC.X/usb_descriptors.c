@@ -2,10 +2,10 @@
  * @file usb_descriptors.h
  * @brief Contains core USB stack descriptors stored in ROM.
  * @author John Izzard
- * @date 20/03/2023
+ * @date 26/01/2024
  *
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2023  John Izzard
+ * Copyright (C) 2017-2024  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "usb_ch9.h"
 
 #define DEV_DESC_PID 0xEB78
-#define REL_NUM      0x0111
+#define REL_NUM      0x0112
 
 #if defined(_PIC14E)
 #define PROD_STR {'U','S','B',' ','u','C',' ','1','4','5','X'}

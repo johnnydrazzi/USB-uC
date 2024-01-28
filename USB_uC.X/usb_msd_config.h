@@ -2,10 +2,10 @@
  * @file usb_msd_config.h
  * @brief <i>Mass Storage Class</i> user settings.
  * @author John Izzard
- * @date 17/06/2020
+ * @date 26/01/2024
  * 
  * USB uC - MSD Library.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2024  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #ifndef USB_MSD_CONFIG
 #define USB_MSD_CONFIG
 
-#include <xc.h>
 #include "usb_config.h"
 
 // External Media Support

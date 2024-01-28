@@ -2,10 +2,10 @@
  * @file usb_app.h
  * @brief USB application header.
  * @author John Izzard
- * @date 05/06/2020
+ * @date 17/12/2023
  * 
  * USB uC - USB Application file.
- * Copyright (C) 2017-2020  John Izzard
+ * Copyright (C) 2017-2023  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,13 +42,16 @@
 bool usb_service_class_request(void);
 
 /**
- * @fn bool usb_get_class_descriptor(void)
+ * @fn bool usb_get_class_descriptor(const uint8_t** descriptor, uint16_t* size)
  * 
- * @brief Used to send Class Descriptors.
+ * @brief Used to service Get Class Descriptor Requests.
  * 
- * @return Returns true if descriptor is to be sent.
+ * @param[out] descriptor Descriptor to respond with.
+ * @param[out] size Size of the response descriptor.
+ * 
+ * @return Returns success (true) or failure (false) to execute the Request.
  */
-bool usb_get_class_descriptor(void);
+bool usb_get_class_descriptor(const uint8_t** descriptor, uint16_t* size);
 
 /**
  * @fn void usb_app_init(void)

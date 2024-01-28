@@ -1,10 +1,10 @@
 /**
  * @file bootloader.c
  * @author John Izzard
- * @date 10/03/2023
+ * @date 28/01/2024
  * 
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2023  John Izzard
+ * Copyright (C) 2017-2024  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "bootloader.h"
 #include "config.h"
 #include "flash.h"
-#include "EEPROM.h"
+#include "eeprom.h"
 
 #if defined(_PIC14E)
 // _FLASH_WRITE_SIZE is in words (14bits), double to be in bytes.
@@ -39,63 +39,171 @@
 #define INDEX_MASK (((uint24_t)FLASH_WRITE_SIZE) - 1)
 #define FLASH_ADDR_MASK ~INDEX_MASK
 
+/* ************************************************************************** */
+/* ************************** GLOBAL VARIABLES ****************************** */
+/* ************************************************************************** */
+
 bool g_boot_reset;
+
+/* ************************************************************************** */
+/* ************************* EXTERNAL VARIABLES ***************************** */
+/* ************************************************************************** */
+
+extern bool user_firmware;
+
+/* ************************************************************************** */
+/* ************************* STATIC PROTOTYPES ****************************** */
+/* ************************************************************************** */
+
+static void     generate_boot(void);
+static void     generate_FAT(void);
+static void     generate_root(void);
+
+static uint8_t  hex_parse(uint8_t chr);
+static bool     hex_char_to_char(uint8_t* chr);
+
+static bool     update_erase_block(uint24_t address, uint8_t* data, uint8_t cnt);
+static uint32_t LBA_to_flash_addr (uint32_t LBA);
+static void     delete_file(void);
+static bool     safely_write_block(uint24_t start_addr);
+
+static uint8_t  get_device(void);
+
+/* ************************************************************************** */
+/* ************************** STATIC VARIABLES ****************************** */
+/* ************************************************************************** */
 
 static uint8_t  m_flash_block[FLASH_WRITE_SIZE];
 static uint24_t m_prev_flash_addr = PROG_REGION_START;
 static uint8_t  m_prev_block_index = 0;
 
-extern bool     user_firmware;
+/* ************************************************************************** */
+/* ************************** GLOBAL FUNCTIONS ****************************** */
+/* ************************************************************************** */
 
-static uint8_t  hex_parse(uint8_t chr);
-static bool     update_erase_block(uint24_t address, uint8_t* data, uint8_t cnt);
-static void     generate_FAT(void);
-static bool     hex_char_to_char(uint8_t* chr);
-static uint32_t LBA_to_flash_addr (uint32_t LBA);
-static void     delete_file(void);
-static bool     safely_write_block(uint24_t start_addr);
-
-static uint8_t get_device(void);
-
-static bool update_erase_block(uint24_t address, uint8_t* data, uint8_t cnt)
+void boot_process_read(void)
 {
-    uint16_t i;
-    uint8_t  block_index = address & INDEX_MASK;
-    uint24_t flash_addr  = address & FLASH_ADDR_MASK;
-
-    if((flash_addr != m_prev_flash_addr) && (m_prev_block_index != 0)) // If new block
-    {
-        if(!safely_write_block(m_prev_flash_addr)) return false; // Write remaining data in m_flash_block to flash for previous flash address
-        usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block)); // Fill new block with 0xFF            
-    }
+    usb_ram_set(0, g_msd_ep_in, MSD_EP_SIZE); // Blank Regions of memory are read as zero.
     
-    for(i = 0; i < cnt; i++) // Write DATA_REC data into m_flash_block 
+    if(g_msd_rw_10_vars.LBA == BOOT_SECT_ADDR)      generate_boot(); // If PC is reading the Boot Sector.
+    else if(g_msd_rw_10_vars.LBA == FAT_SECT_ADDR)  generate_FAT();  // If PC is reading the first FAT Sector.
+    else if(g_msd_rw_10_vars.LBA == ROOT_SECT_ADDR) generate_root(); // If PC is reading the Root Sector.
+    #ifndef SIMPLE_BOOTLOADER
+    else if(g_msd_rw_10_vars.LBA >= DATA_SECT_ADDR) // If PC is reading the Data Sector.
     {
-        m_flash_block[block_index++] = *data;
-        data++;
-        if(block_index == sizeof(m_flash_block)) break; // Break if m_flash_block is full, it's possible that data still remains
-    }
-
-    if(block_index == sizeof(m_flash_block))
-    {
-        if(!safely_write_block(flash_addr)) return false;        // Write completed m_flash_block to flash
-        usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block)); // Fill new block with 0xFF        
-        block_index = 0;                                         // Reset m_flash_block index
-        i++;
-        if(i < cnt)                                              // If data still remains
+        if(g_msd_rw_10_vars.LBA == ABOUT_SECT_ADDR) // If PC is reading ABOUT file data.
         {
-            for(i = i; i < cnt; i++)                             // Write remaining data to new m_flash_block
+            if(g_msd_byte_of_sect == 0) usb_rom_copy(aboutFile, g_msd_ep_in, 64);
+            else if(g_msd_byte_of_sect == 64) usb_rom_copy((aboutFile + 64), g_msd_ep_in, sizeof(aboutFile)-64);
+        }
+        #if defined(HAS_EEPROM)
+        else if(g_msd_rw_10_vars.LBA == EEPROM_SECT_ADDR)
+        {
+            for(uint8_t i = 0; i < MSD_EP_SIZE; i++) g_msd_ep_in[i] = EEPROM_Read(g_msd_byte_of_sect + i);
+        }
+        #endif
+        else
+        {
+            // Convert from LBA address space to flash address space.
+            uint24_t addr = (uint24_t)LBA_to_flash_addr(g_msd_rw_10_vars.LBA);
+            if(addr < END_OF_FLASH) // If address is in flash space.
             {
-                m_flash_block[block_index++] = *data;
-                data++;
+                // Read flash into g_msd_ep_in buffer.
+                #if defined(_PIC14E)
+                Flash_ReadBytes(addr / 2, MSD_EP_SIZE, g_msd_ep_in);
+                #else
+                Flash_ReadBytes(addr, MSD_EP_SIZE, g_msd_ep_in);
+                #endif
             }
         }
-        flash_addr += sizeof(m_flash_block);
     }
-    m_prev_block_index = block_index;
-    m_prev_flash_addr  = flash_addr;
+    #endif
+}
+
+void boot_process_write(void)
+{
+    static uint8_t boot_state = BOOT_DUMMY;
+    uint16_t i;
     
-    return true;
+    if(boot_state == BOOT_DUMMY)
+    {
+        // If this is the first block, and it's in the DATA sector.
+        if(g_msd_rw_10_vars.LBA == g_msd_rw_10_vars.START_LBA && g_msd_rw_10_vars.LBA >= DATA_SECT_ADDR)
+        {
+            #if defined(SIMPLE_BOOTLOADER) || !defined(HAS_EEPROM)
+            if(g_msd_byte_of_sect == 0 && g_msd_ep_out[0] == ':') // First byte of HEX file is ':'.
+            { 
+                if(user_firmware) delete_file();
+                usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block));
+                boot_state = BOOT_LOAD_HEX;
+            }
+            #else
+            if(g_msd_rw_10_vars.LBA == EEPROM_SECT_ADDR && g_msd_byte_of_sect < EEPROM_SIZE)
+            {
+                for(i = 0; i < MSD_EP_SIZE; i++) EEPROM_Write(g_msd_byte_of_sect + i, g_msd_ep_out[i]);
+            }
+            else if(g_msd_byte_of_sect == 0 && g_msd_ep_out[0] == ':') // First byte of HEX file is ':'.
+            { 
+                if(user_firmware) delete_file();
+                usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block));
+                boot_state = BOOT_LOAD_HEX;
+            }
+            #endif
+        }
+        #ifndef SIMPLE_BOOTLOADER
+        if(g_msd_rw_10_vars.LBA == ROOT_SECT_ADDR && g_msd_byte_of_sect == 64)
+        {
+            #ifdef HAS_EEPROM
+            if(user_firmware && (g_msd_ep_out[32] == 0x00 || g_msd_ep_out[32] == 0xE5))
+            #else
+            if(user_firmware && (g_msd_ep_out[0] == 0x00 || g_msd_ep_out[0] == 0xE5))
+            #endif
+            {
+                delete_file();  
+                g_boot_reset = true;
+            }
+
+            #ifdef HAS_EEPROM
+            if(g_msd_ep_out[0] == 0x00 || g_msd_ep_out[0] == 0xE5)
+            {
+                for(i = 0; i < EEPROM_SIZE; i++) EEPROM_Write(i, 0xFF);
+                g_boot_reset = true;
+            }
+            #endif
+        }
+        #endif
+    }
+    
+    if(boot_state == BOOT_LOAD_HEX && g_msd_rw_10_vars.LBA >= DATA_SECT_ADDR)
+    {
+        uint8_t hex_result;
+        
+        for(i = 0; i < MSD_EP_SIZE; i++)
+        {
+            hex_result = hex_parse(g_msd_ep_out[i]);
+            if(hex_result != HEX_PARSING)
+            {
+                if(hex_result == HEX_FAULT) delete_file();
+                boot_state = BOOT_FINISHED;
+                g_boot_reset = true;
+                break;
+            }
+        }
+    }
+}
+
+/* ************************************************************************** */
+/* ************************** STATIC FUNCTIONS ****************************** */
+/* ************************************************************************** */
+
+static void generate_boot(void)
+{
+    if(g_msd_byte_of_sect == 0) usb_rom_copy((const uint8_t*)(&BOOT16), g_msd_ep_in, sizeof(BOOT16));
+    else if(g_msd_byte_of_sect == 448)
+    {
+        g_msd_ep_in[62] = 0x55;
+        g_msd_ep_in[63] = 0xAA;
+    }
 }
 
 static void generate_FAT(void)
@@ -174,202 +282,102 @@ static void generate_FAT(void)
     #endif
 }
 
-void boot_process_read(void)
+static void generate_root(void)
 {
-    usb_ram_set(0, g_msd_ep_in, MSD_EP_SIZE); // Blank Regions of memory are read as zero.
-    
-    if(g_msd_rw_10_vars.LBA == BOOT_SECT_ADDR) // If PC is reading the Boot Sector.
+    if(g_msd_byte_of_sect == 0)
     {
-        if(g_msd_byte_of_sect == 0) usb_rom_copy((const uint8_t*)(&BOOT16), g_msd_ep_in, sizeof(BOOT16));
-        else if(g_msd_byte_of_sect == 448)
-        {
-            g_msd_ep_in[62] = 0x55;
-            g_msd_ep_in[63] = 0xAA;
-        }
-    }
-    else if(g_msd_rw_10_vars.LBA == FAT_SECT_ADDR) // If PC is reading the first FAT Sector.
-    {
-        generate_FAT();
-    }
-    else if(g_msd_rw_10_vars.LBA == ROOT_SECT_ADDR) // If PC is reading the Root Sector.
-    {
-        if(g_msd_byte_of_sect == 0)
-        {
-            usb_rom_copy(ROOT.VOL, &g_msd_ep_in[0], 11);
-            g_msd_ep_in[11] = 0x08;
-            #if defined(_PIC14E)
-            g_msd_ep_in[9] = get_device();
-            #elif !defined(_18F14K50) && !defined(_18F24K50)
-            g_msd_ep_in[6] = get_device();
-            #endif
-            #ifndef SIMPLE_BOOTLOADER
-            usb_rom_copy(ROOT.FILE1, &g_msd_ep_in[32], 11);
-            g_msd_ep_in[43] = 0x21; // ATTR_READ_ONLY (0x01) | ATTR_ARCHIVE (0x20).
-            g_msd_ep_in[58] = 2;
-            g_msd_ep_in[60] = (uint8_t)sizeof(aboutFile);
-            g_msd_ep_in[61] = (uint8_t)(sizeof(aboutFile) >> 8);
-            #endif
-        }
+        usb_rom_copy(ROOT.VOL, &g_msd_ep_in[0], 11);
+        g_msd_ep_in[11] = 0x08;
+        #if defined(_PIC14E)
+        g_msd_ep_in[9] = get_device();
+        #elif !defined(_18F14K50) && !defined(_18F24K50)
+        g_msd_ep_in[6] = get_device();
+        #endif
         #ifndef SIMPLE_BOOTLOADER
-        else if(g_msd_byte_of_sect == 64)
-        {
-            #ifdef HAS_EEPROM
-            usb_rom_copy(ROOT.FILE2, &g_msd_ep_in[0], 11);
-            g_msd_ep_in[11] = 0x20; // ATTR_ARCHIVE.
-            g_msd_ep_in[26] = 3;
-            g_msd_ep_in[28] = (uint8_t)EEPROM_SIZE;
-            g_msd_ep_in[29] = (uint8_t)(EEPROM_SIZE >> 8);
-            if(user_firmware)
-            {
-                usb_rom_copy(ROOT.FILE3, &g_msd_ep_in[32], 11);
-                g_msd_ep_in[43] = 0x21; // ATTR_READ_ONLY | ATTR_ARCHIVE.
-                g_msd_ep_in[58] = (uint8_t)PROG_MEM_CLUST;
-                g_msd_ep_in[60] = (uint8_t)FILE_SIZE;
-                g_msd_ep_in[61] = (uint8_t)(FILE_SIZE >> 8);
-                #if FILE_SIZE >= 0x10000
-                g_msd_ep_in[62] = (uint8_t)(FILE_SIZE >> 16);
-                #endif
-            }
-            #else
-            if(user_firmware)
-            {
-                usb_rom_copy(ROOT.FILE2, &g_msd_ep_in[0], 11);
-                g_msd_ep_in[11] = 0x21; // ATTR_READ_ONLY (0x01) | ATTR_ARCHIVE (0x20).
-                g_msd_ep_in[26] = (uint8_t)PROG_MEM_CLUST;
-                g_msd_ep_in[28] = (uint8_t)FILE_SIZE;
-                g_msd_ep_in[29] = (uint8_t)(FILE_SIZE >> 8);
-                #if FILE_SIZE >= 0x10000
-                g_msd_ep_in[30] = (uint8_t)(FILE_SIZE >> 16);
-                #endif
-            }
-            #endif
-        }
+        usb_rom_copy(ROOT.FILE1, &g_msd_ep_in[32], 11);
+        g_msd_ep_in[43] = 0x21; // ATTR_READ_ONLY (0x01) | ATTR_ARCHIVE (0x20).
+        g_msd_ep_in[58] = 2;
+        g_msd_ep_in[60] = (uint8_t)sizeof(aboutFile);
+        g_msd_ep_in[61] = (uint8_t)(sizeof(aboutFile) >> 8);
         #endif
     }
     #ifndef SIMPLE_BOOTLOADER
-    else if(g_msd_rw_10_vars.LBA >= DATA_SECT_ADDR) // If PC is reading the Data Sector.
+    else if(g_msd_byte_of_sect == 64)
     {
-        if(g_msd_rw_10_vars.LBA == ABOUT_SECT_ADDR) // If PC is reading ABOUT file data.
+        #ifdef HAS_EEPROM
+        usb_rom_copy(ROOT.FILE2, &g_msd_ep_in[0], 11);
+        g_msd_ep_in[11] = 0x20; // ATTR_ARCHIVE.
+        g_msd_ep_in[26] = 3;
+        g_msd_ep_in[28] = (uint8_t)EEPROM_SIZE;
+        g_msd_ep_in[29] = (uint8_t)(EEPROM_SIZE >> 8);
+        if(user_firmware)
         {
-            if(g_msd_byte_of_sect == 0) usb_rom_copy(aboutFile, g_msd_ep_in, 64);
-            else if(g_msd_byte_of_sect == 64) usb_rom_copy((aboutFile + 64), g_msd_ep_in, sizeof(aboutFile)-64);
+            usb_rom_copy(ROOT.FILE3, &g_msd_ep_in[32], 11);
+            g_msd_ep_in[43] = 0x21; // ATTR_READ_ONLY | ATTR_ARCHIVE.
+            g_msd_ep_in[58] = (uint8_t)PROG_MEM_CLUST;
+            g_msd_ep_in[60] = (uint8_t)FILE_SIZE;
+            g_msd_ep_in[61] = (uint8_t)(FILE_SIZE >> 8);
+            #if FILE_SIZE >= 0x10000
+            g_msd_ep_in[62] = (uint8_t)(FILE_SIZE >> 16);
+            #endif
         }
-        #if defined(HAS_EEPROM)
-        else if(g_msd_rw_10_vars.LBA == EEPROM_SECT_ADDR)
+        #else
+        if(user_firmware)
         {
-            for(uint8_t i = 0; i < MSD_EP_SIZE; i++) g_msd_ep_in[i] = EEPROM_Read(g_msd_byte_of_sect + i);
+            usb_rom_copy(ROOT.FILE2, &g_msd_ep_in[0], 11);
+            g_msd_ep_in[11] = 0x21; // ATTR_READ_ONLY (0x01) | ATTR_ARCHIVE (0x20).
+            g_msd_ep_in[26] = (uint8_t)PROG_MEM_CLUST;
+            g_msd_ep_in[28] = (uint8_t)FILE_SIZE;
+            g_msd_ep_in[29] = (uint8_t)(FILE_SIZE >> 8);
+            #if FILE_SIZE >= 0x10000
+            g_msd_ep_in[30] = (uint8_t)(FILE_SIZE >> 16);
+            #endif
         }
         #endif
-        else
-        {
-            // Convert from LBA address space to flash address space.
-            uint24_t addr = LBA_to_flash_addr(g_msd_rw_10_vars.LBA);
-            if(addr < END_OF_FLASH) // If address is in flash space.
-            {
-                // Read flash into g_msd_ep_in buffer.
-                #if defined(_PIC14E)
-                Flash_ReadBytes(addr / 2, MSD_EP_SIZE, g_msd_ep_in);
-                #else
-                Flash_ReadBytes(addr, MSD_EP_SIZE, g_msd_ep_in);
-                #endif
-            }
-        }
     }
     #endif
 }
 
-void boot_process_write(void)
+
+static bool update_erase_block(uint24_t address, uint8_t* data, uint8_t cnt)
 {
-    static uint8_t boot_state = BOOT_DUMMY;
-    uint8_t  hex_result;
     uint16_t i;
-    
-    if(boot_state == BOOT_DUMMY)
+    uint8_t  block_index = address & INDEX_MASK;
+    uint24_t flash_addr  = address & FLASH_ADDR_MASK;
+
+    if((flash_addr != m_prev_flash_addr) && (m_prev_block_index != 0)) // If new block
     {
-        // If this is the first block, and it's in the DATA sector.
-        if(g_msd_rw_10_vars.LBA == g_msd_rw_10_vars.START_LBA && g_msd_rw_10_vars.LBA >= DATA_SECT_ADDR)
-        {
-            #if defined(SIMPLE_BOOTLOADER) || !defined(HAS_EEPROM)
-            if(g_msd_byte_of_sect == 0)
-            { 
-                if(g_msd_ep_out[0] == ':') // First byte of HEX file is ':'.
-                {
-                    if(user_firmware) delete_file();
-                    usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block));
-                    boot_state = BOOT_LOAD_HEX;
-                }
-            }
-            #else
-            if(g_msd_rw_10_vars.LBA == EEPROM_SECT_ADDR)
-            {
-                if(g_msd_byte_of_sect < EEPROM_SIZE)
-                {
-                    for(i = 0; i < MSD_EP_SIZE; i++) EEPROM_Write(g_msd_byte_of_sect + i, g_msd_ep_out[i]);
-                }
-            }
-            else if(g_msd_byte_of_sect == 0)
-            { 
-                if(g_msd_ep_out[0] == ':') // First byte of HEX file is ':'.
-                {
-                    if(user_firmware) delete_file();
-                    usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block));
-                    boot_state = BOOT_LOAD_HEX;
-                }
-            }
-            #endif
-        }
-        #ifndef SIMPLE_BOOTLOADER
-        if(g_msd_rw_10_vars.LBA == ROOT_SECT_ADDR)
-        {
-            if(g_msd_byte_of_sect == 64)
-            {
-                #if defined(HAS_EEPROM)
-                if(user_firmware)
-                {
-                    if(g_msd_ep_out[32] == 0x00 || g_msd_ep_out[32] == 0xE5)
-                    {
-                        delete_file();  
-                        g_boot_reset = true;
-                    }
-                }
-                
-                if(g_msd_ep_out[0] == 0x00 || g_msd_ep_out[0] == 0xE5)
-                {
-                    for(i = 0; i < EEPROM_SIZE; i++) EEPROM_Write(i, 0xFF);
-                    g_boot_reset = true;
-                }
-                #else
-                if(user_firmware)
-                {
-                    if(g_msd_ep_out[0] == 0x00 || g_msd_ep_out[0] == 0xE5)
-                    {
-                        delete_file();  
-                        g_boot_reset = true;
-                    }
-                }
-                #endif
-            }
-        }
-        #endif
+        if(!safely_write_block(m_prev_flash_addr)) return false; // Write remaining data in m_flash_block to flash for previous flash address
+        usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block)); // Fill new block with 0xFF            
     }
     
-    if(boot_state == BOOT_LOAD_HEX)
+    for(i = 0; i < cnt; i++) // Write DATA_REC data into m_flash_block 
     {
-        if(g_msd_rw_10_vars.LBA >= DATA_SECT_ADDR)
+        m_flash_block[block_index++] = *data;
+        data++;
+        if(block_index == sizeof(m_flash_block)) break; // Break if m_flash_block is full, it's possible that data still remains
+    }
+
+    if(block_index == sizeof(m_flash_block))
+    {
+        if(!safely_write_block(flash_addr)) return false;        // Write completed m_flash_block to flash
+        usb_ram_set(0xFF, m_flash_block, sizeof(m_flash_block)); // Fill new block with 0xFF        
+        block_index = 0;                                         // Reset m_flash_block index
+        i++;
+        if(i < cnt)                                              // If data still remains
         {
-            for(i = 0; i < MSD_EP_SIZE; i++)
+            for(i = i; i < cnt; i++)                             // Write remaining data to new m_flash_block
             {
-                hex_result = hex_parse(g_msd_ep_out[i]);
-                if(hex_result != HEX_PARSING)
-                {
-                    if(hex_result == HEX_FAULT) delete_file();
-                    boot_state = BOOT_FINISHED;
-                    g_boot_reset = true;
-                    break;
-                }
+                m_flash_block[block_index++] = *data;
+                data++;
             }
         }
-    } 
+        flash_addr += sizeof(m_flash_block);
+    }
+    m_prev_block_index = block_index;
+    m_prev_flash_addr  = flash_addr;
+    
+    return true;
 }
 
 static uint8_t hex_parse(uint8_t chr)
@@ -548,7 +556,7 @@ static void delete_file(void)
 {
 #if defined(_PIC14E)
     Flash_Erase(PROG_REGION_START / 2, END_OF_FLASH / 2);
-#elif (__J_PART)
+#elif defined(__J_PART)
     Flash_Erase(PROG_REGION_START, CONFIG_PAGE_START);
 #else
     Flash_Erase(PROG_REGION_START, END_OF_FLASH);
@@ -557,27 +565,29 @@ static void delete_file(void)
 
 static bool safely_write_block(uint24_t start_addr)
 {
-#if defined(_PIC14E)
-    if((start_addr < END_OF_FLASH) && (start_addr >= PROG_REGION_START)) Flash_WriteBlock(start_addr / 2, m_flash_block);
-    else if(start_addr == CONFIG_REGION_START){}
-    else if(start_addr < PROG_REGION_START){}
-    else return false;
-    return true;
-#elif defined(__J_PART)
+#ifdef __J_PART
     if(start_addr < CONFIG_PAGE_START && start_addr >= PROG_REGION_START) Flash_WriteBlock(start_addr, m_flash_block);
     else if(start_addr < END_OF_FLASH){}      
     else return false;
     return true;
 #else
-    uint8_t i;
-    if((start_addr < END_OF_FLASH) && (start_addr >= PROG_REGION_START)) Flash_WriteBlock(start_addr, m_flash_block);
+    if((start_addr < END_OF_FLASH) && (start_addr >= PROG_REGION_START))
+    {
+        #ifdef _PIC14E
+        Flash_WriteBlock(start_addr / 2, m_flash_block);
+        #else
+        Flash_WriteBlock(start_addr, m_flash_block);
+        #endif
+    }
+    #ifndef _PIC14E
     else if(start_addr == ID_REGION_START){}
+    #endif
     else if(start_addr == CONFIG_REGION_START){}
     #ifdef HAS_EEPROM
     else if((start_addr < END_OF_EEPROM) && (start_addr >= EEPROM_REGION_START))
     {
         start_addr &= 0xFF;
-        for(i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
+        for(uint8_t i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
     }
     #endif
     else if(start_addr < PROG_REGION_START){}

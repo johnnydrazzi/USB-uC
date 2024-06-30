@@ -1,7 +1,7 @@
 /**
  * @file bootloader.c
  * @author John Izzard
- * @date 28/01/2024
+ * @date 30/06/2024
  * 
  * USB uC - USB MSD Bootloader.
  * Copyright (C) 2017-2024  John Izzard
@@ -99,7 +99,7 @@ void boot_process_read(void)
         #if defined(HAS_EEPROM)
         else if(g_msd_rw_10_vars.LBA == EEPROM_SECT_ADDR)
         {
-            for(uint8_t i = 0; i < MSD_EP_SIZE; i++) g_msd_ep_in[i] = EEPROM_Read(g_msd_byte_of_sect + i);
+            for(uint8_t i = 0; i < MSD_EP_SIZE; i++) g_msd_ep_in[i] = EEPROM_Read((uint8_t)g_msd_byte_of_sect + i);
         }
         #endif
         else
@@ -140,7 +140,7 @@ void boot_process_write(void)
             #else
             if(g_msd_rw_10_vars.LBA == EEPROM_SECT_ADDR && g_msd_byte_of_sect < EEPROM_SIZE)
             {
-                for(i = 0; i < MSD_EP_SIZE; i++) EEPROM_Write(g_msd_byte_of_sect + i, g_msd_ep_out[i]);
+                for(i = 0; i < MSD_EP_SIZE; i++) EEPROM_Write((uint8_t)(g_msd_byte_of_sect + i), g_msd_ep_out[i]);
             }
             else if(g_msd_byte_of_sect == 0 && g_msd_ep_out[0] == ':') // First byte of HEX file is ':'.
             { 
@@ -166,7 +166,7 @@ void boot_process_write(void)
             #ifdef HAS_EEPROM
             if(g_msd_ep_out[0] == 0x00 || g_msd_ep_out[0] == 0xE5)
             {
-                for(i = 0; i < EEPROM_SIZE; i++) EEPROM_Write(i, 0xFF);
+                for(i = 0; i < EEPROM_SIZE; i++) EEPROM_Write((uint8_t)i, 0xFF);
                 g_boot_reset = true;
             }
             #endif
@@ -382,165 +382,110 @@ static bool update_erase_block(uint24_t address, uint8_t* data, uint8_t cnt)
 
 static uint8_t hex_parse(uint8_t chr)
 {
-    static uint8_t  hex_state = HEX_START;
-    static uint8_t  rec_len, chksum, chksum_calc, rectype, data[16], data_index, data_byte;
-    static uint16_t load_offset, ULBA, char_cnt;
-    static uint24_t ULBA_calc;
+    static uint8_t  ret_code, hex_state = HEX_START;
+    static uint8_t  rec_len, chksum_calc, rectype, data[16], data_index;
+    static uint16_t load_offset, char_cnt = 0, parse_data = 0;
+    static uint24_t ULBA_calc = 0;
+    static bool     is_hex_data, new_state = false;
     
-    if(hex_state != HEX_START)
-    {
-        // If this is not the start of the HEX file, and chr is 0-9 or A-F in ASCII, convert to HEX
-        if(!hex_char_to_char(&chr))
+    is_hex_data = hex_char_to_char(&chr);
+
+    // If this is not the start of the HEX record, and chr is not 0-9 or A-F in ASCII, this is an error.
+    if(hex_state != HEX_START && is_hex_data == false) return HEX_FAULT;
+    
+    ret_code  = HEX_PARSING;
+    parse_data = (parse_data << 4) | chr;
+    char_cnt++;
+    
+    if(hex_state == HEX_START)
+    {   // Wait for start of file ':'
+        if(chr == '\r' || chr == '\n') {}
+        else if(chr == ':')
         {
+            hex_state = HEX_REC_LEN;
+            new_state = true;
+        }
+        else ret_code = HEX_FAULT;
+    }
+    else if(hex_state == HEX_REC_LEN && char_cnt == 2)
+    {   // Get Record length
+        rec_len = (uint8_t)parse_data;
+        if(rec_len <= 0x10) // Support only up to 16 byte rows.
+        {
+            chksum_calc = rec_len;
+            hex_state   = HEX_LOAD_OFFSET;
+            new_state   = true;
+        }
+        else ret_code = HEX_FAULT;
+    }
+    else if(hex_state == HEX_LOAD_OFFSET && char_cnt == 4)
+    {   // Get Load Offset (offset address from current base address)
+        load_offset  = parse_data;
+        chksum_calc += (uint8_t)load_offset;
+        chksum_calc += (uint8_t)(load_offset >> 8);
+        hex_state    = HEX_RECTYPE;
+        new_state    = true;
+    }
+    else if(hex_state == HEX_RECTYPE && char_cnt == 2)
+    {   // Get Record Type
+        rectype      = (uint8_t)parse_data;
+        chksum_calc += rectype;
+        if(rectype == DATA_REC) // Data Record
+        {
+            data_index = 0;
+            hex_state  = HEX_DATA;
+        }
+        else if(rectype == EOF_REC) hex_state = HEX_CHKSUM; // End of File Record
+        else if(rectype == ELA_REC) hex_state = HEX_ELA;    // Extended Linear Address Record
+        else ret_code  = HEX_FAULT;
+        new_state = true;
+    }
+    else if(hex_state == HEX_DATA && char_cnt == 2)
+    {
+        data[data_index] = (uint8_t)parse_data;
+        chksum_calc += data[data_index++];
+        if(data_index >= rec_len) hex_state = HEX_CHKSUM;
+        new_state = true;
+    }
+    else if(hex_state == HEX_ELA && char_cnt == 4)
+    {
+        chksum_calc += (uint8_t)parse_data;
+        chksum_calc += (uint8_t)(parse_data >> 8);
+        ULBA_calc = ((uint24_t)parse_data) << 16;
+        hex_state = HEX_CHKSUM;
+        new_state = true;
+    }
+    else if(hex_state == HEX_CHKSUM && char_cnt == 2)
+    {
+        chksum_calc += (uint8_t)parse_data;
+        if(chksum_calc) ret_code = HEX_FAULT;
+        else
+        {
+            if(rectype == DATA_REC) // Data Record
+            {
+                if(!update_erase_block(ULBA_calc + (uint24_t)load_offset, data, rec_len)) ret_code = HEX_FAULT;
+            }
+            else if(rectype == EOF_REC) // End of File Record
+            {
+                ret_code = HEX_FINISHED;
+                if(m_prev_block_index != 0) // Data left in m_flash_block not yet written.
+                {
+                    if(!safely_write_block(m_prev_flash_addr)) ret_code = HEX_FAULT;
+                }
+            }
             hex_state = HEX_START;
-            return HEX_FAULT; 
+            new_state = true;
         }
     }
     
-    switch(hex_state)
+    if(new_state)
     {
-        case HEX_START: // Wait for start of file ':'
-            if(chr == '\r' || chr == '\n') break;
-            if(chr == ':')
-            {
-                chksum_calc = 0;                
-                char_cnt    = 2; // We are expecting 2 chars next
-                rec_len     = 0;
-                hex_state   = HEX_REC_LEN;
-                return HEX_PARSING;
-            }
-            hex_state = HEX_START;
-            return HEX_FAULT; 
-        case HEX_REC_LEN: // Get Record length
-            rec_len = (rec_len << 4) | chr;
-            char_cnt--;
-            if(char_cnt == 0)
-            {
-                if(rec_len > 16) // Support only up to 16 byte rows.
-                {
-                    hex_state = HEX_START;
-                    return HEX_FAULT; 
-                }
-                chksum_calc += rec_len;
-                char_cnt     = 4;
-                load_offset  = 0;
-                hex_state    = HEX_LOAD_OFFSET;
-            }
-            break;
-        case HEX_LOAD_OFFSET: // Get Load Offset (offset address from current base address)
-            load_offset = (load_offset << 4) | (uint16_t)chr;
-            char_cnt--;
-            if(char_cnt == 0)
-            {
-                //if(load_offset % 2){hex_state = HEX_START; return false;} // load_offset must be even.
-                
-                chksum_calc += load_offset >> 8;
-                chksum_calc += load_offset;
-                
-                char_cnt  = 2;
-                rectype   = 0;
-                hex_state = HEX_RECTYPE;
-            }
-            break;
-        case HEX_RECTYPE: // Get Record Type
-            char_cnt--; // Only interested in the second received byte (lower nibble)
-            if(char_cnt == 0)
-            {
-                rectype = chr;
-                chksum_calc += rectype;
-                switch(rectype)
-                {
-                    case DATA_REC: // Data Record
-                        char_cnt   = 2;
-                        data_index = 0;
-                        data_byte  = 0;
-                        hex_state  = HEX_DATA;
-                        break;
-                    case EOF_REC: // End of File Record
-                        char_cnt  = 2;
-                        chksum    = 0;
-                        hex_state = HEX_CHKSUM;
-                        break;
-                    case ELA_REC: // Extended Linear Address Record
-                        char_cnt  = 4;
-                        ULBA      = 0;
-                        hex_state = HEX_ELA;
-                        break;
-                    default:
-                        hex_state = HEX_START;
-                        return HEX_FAULT;
-                }
-            }
-            break;
-        case HEX_DATA:
-            char_cnt--;
-            if(char_cnt == 1){data_byte = chr; data_byte <<= 4;}
-            if(char_cnt == 0)
-            {
-                data_byte       |= chr;
-                data[data_index] = data_byte;
-                chksum_calc     += data[data_index];
-                data_index++;
-                char_cnt = 2;
-                if(data_index == rec_len)
-                {
-                    chksum    = 0;
-                    hex_state = HEX_CHKSUM;
-                }
-            }
-            break;
-        case HEX_ELA:
-            ULBA = (ULBA << 4) | (uint16_t)chr;
-            char_cnt--;
-            if(char_cnt == 0)
-            {
-                chksum_calc += ULBA;
-                ULBA_calc = ((uint24_t)ULBA) << 16;
-                char_cnt  = 2;
-                chksum    = 0;
-                hex_state = HEX_CHKSUM;
-            }
-            break;
-        case HEX_CHKSUM:
-            char_cnt--;
-            if(char_cnt == 1){chksum = chr; chksum <<= 4;}
-            if(char_cnt == 0)
-            {
-                chksum      |= chr;
-                chksum_calc += chksum;
-                if(chksum_calc)
-                {
-                    hex_state = HEX_START;
-                    return HEX_FAULT;
-                }
-                switch(rectype)
-                {
-                    case DATA_REC: // Data Record
-                        if(!update_erase_block(ULBA_calc + (uint24_t)load_offset, data, rec_len))
-                        {
-                            hex_state = HEX_START;
-                            return HEX_FAULT;
-                        }
-                        break;
-                    case EOF_REC: // End of File Record
-                        if(m_prev_block_index != 0) // Data left in m_flash_block not yet written.
-                        {
-                            if(!safely_write_block(m_prev_flash_addr))
-                            {
-                                hex_state = HEX_START;
-                                return HEX_FAULT;
-                            }
-                        }
-                        hex_state = HEX_START;
-                        return HEX_FINISHED;
-                    case ELA_REC: // Extended Linear Address Record
-                        break;
-                }
-                hex_state = HEX_START;
-            }
-            break;
+        char_cnt  = 0;
+        parse_data = 0;
+        new_state = false;
     }
-    return HEX_PARSING;
+    
+    return ret_code;
 }
 
 static bool hex_char_to_char(uint8_t* chr)
@@ -587,7 +532,7 @@ static bool safely_write_block(uint24_t start_addr)
     else if((start_addr < END_OF_EEPROM) && (start_addr >= EEPROM_REGION_START))
     {
         start_addr &= 0xFF;
-        for(uint8_t i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write(start_addr + i, m_flash_block[i]);
+        for(uint8_t i = 0; i < _FLASH_WRITE_SIZE; i++) EEPROM_Write((uint8_t)start_addr + i, m_flash_block[i]);
     }
     #endif
     else if(start_addr < PROG_REGION_START){}

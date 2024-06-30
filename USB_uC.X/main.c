@@ -2,10 +2,10 @@
  * @file main.c
  * @brief Main C file.
  * @author John Izzard
- * @date 25/04/2023
+ * @date 30/06/2024
  * 
  * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2023  John Izzard
+ * Copyright (C) 2017-2024  John Izzard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,14 +20,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  * 
- * Project Version: v1.11
- * MPLABX: v6.05
- * XC8: v2.41
+ * Project Version: v1.13
+ * MPLABX: v6.20
+ * XC8: v2.46
  * Device Packages Used:
- *      - PIC12-16F1xxx_DFP v1.3.90
- *      - PIC18Fxxxx_DFP v1.3.36
- *      - PIC18F-K_DFP v1.8.249
- *      - PIC18F-J_DFP v1.5.44
+ *      - PIC12-16F1xxx_DFP v1.7.242
+ *      - PIC18Fxxxx_DFP v1.6.159
+ *      - PIC18F-K_DFP v1.13.292
+ *      - PIC18F-J_DFP v1.7.159
  */
 
 #include <xc.h>

@@ -61,6 +61,7 @@
  *      - PIC18Fxxxx_DFP v1.6.159
  *      - PIC18F-K_DFP v1.13.292
  *      - PIC18F-J_DFP v1.7.159
+ * USB-Stack: v0.0.3
  */
 
 #include <xc.h>

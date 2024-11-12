@@ -1,25 +1,56 @@
 /**
  * @file usb_scsi_inq.c
- * @brief Contains SCSI's Inquiry Command Response.
  * @author John Izzard
- * @date 30/06/2024
- *
- * USB uC - MSD Library.
- * Copyright (C) 2017-2023  John Izzard
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * @date 2024-11-12
+ * 
+ * @brief USB uC - Contains SCSI's Inquiry Command Response.
  */
+
+/**
+ * Copyright (C) 2017-2024 John Izzard
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the “Software”), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * Change Log
+ * ----------
+ * Version 1.4.1 - 2024-11-12
+ * - Changed: MIT License.
+ *
+ * Version 1.4.0 - 2024-06-30
+ * - Changed: Release number v1.13.
+ *
+ * Version 1.3.0 - 2024-01-26
+ * - Changed: Release number v1.12.
+ *
+ * Version 1.2.0 - 2023-04-07
+ * - Added: Support for _18F4450_FAMILY_ and _18F46J50_FAMILY_.
+ * - Changed: Release number v1.11.
+ *
+ * Version 1.1.0 - 2021-05-01
+ * - Changed: Release number v1.10.
+ *
+ * Version 1.0.0 - 2020-06-28
+ * - Added: Initial release of the software.
+ */
+
 #include "usb_scsi.h"
 
 // String Settings

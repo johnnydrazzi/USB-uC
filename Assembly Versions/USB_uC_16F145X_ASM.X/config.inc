@@ -1,23 +1,31 @@
 ;*******************************************************************************
 ;                                                                              *
-;    This program is free software: you can redistribute it and/or modify      *
-;    it under the terms of the GNU General Public License as published by      *
-;    the Free Software Foundation, either version 3 of the License, or         *
-;    (at your option) any later version.                                       *
+;    Copyright (c) 2024 John Izzard                                            *
 ;                                                                              *
-;    This program is distributed in the hope that it will be useful,           *
-;    but WITHOUT ANY WARRANTY; without even the implied warranty of            *
-;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
-;    GNU General Public License for more details.                              *
+;    Permission is hereby granted, free of charge, to any person obtaining     *
+;    a copy of this software and associated documentation files (the           *
+;    "Software"), to deal in the Software without restriction, including       *
+;    without limitation the rights to use, copy, modify, merge, publish,       *
+;    distribute, sublicense, and/or sell copies of the Software, and to        *
+;    permit persons to whom the Software is furnished to do so, subject to     *
+;    the following conditions:                                                 *
 ;                                                                              *
-;    You should have received a copy of the GNU General Public License         *
-;    along with this program.  If not, see <https://www.gnu.org/licenses/>.    *
+;    The above copyright notice and this permission notice shall be            *
+;    included in all copies or substantial portions of the Software.           *
+;                                                                              *
+;    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,           *
+;    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF        *
+;    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.    *
+;    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY      *
+;    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,      *
+;    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE         *
+;    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                    *
 ;                                                                              *
 ;*******************************************************************************
 ;                                                                              *
 ;    Filename: config.inc                                                      *
-;    Date: 29/04/2021                                                          *
-;    File Version: 1.00                                                        *
+;    Date: 2024-11-12                                                          *
+;    File Version: 1.1.0                                                       *
 ;    Author: John Izzard                                                       *
 ;    Company: N/A                                                              *
 ;    Description: Configure the bootloder here. Enable features, change the    *
@@ -27,6 +35,15 @@
 ;*******************************************************************************
 ;                                                                              *
 ;    Revision History:                                                         *
+;    File Version 1.1.0 - 2024-11-12                                           *
+;    - Changed: MIT license.                                                   *
+;    - Added: Guards for BOARD_VERSION and XTAL_USED, so that build script     *
+;             can add these preprocessor defines. Hex is unchanged.            *
+;    - Changed: Default hex was PIC16F1454, all are now exported.              *
+;    - Changed: Device used is defined in configuration now.                   *
+;                                                                              *
+;    File Version 1.0.0 - 2021-05-01                                           *
+;    - Added: Initial release.                                                 *
 ;                                                                              *
 ;*******************************************************************************
 
@@ -54,8 +71,9 @@ END_OF_FLASH        equ 0x2000 ;(Don't modify).
 CONFIG_REGION_START equ 0x8000 ;(Don't modify).
 
 ; Processor:
-; Uncomment the processor used.
-#define PIC16F1454
+; Defined in the configuration used.
+; Uncomment the processor used if using old MPLAB (not MPLAB X).
+;#define PIC16F1454
 ;#define PIC16F1455
 ;#define PIC16F1459
  
@@ -71,10 +89,14 @@ CONFIG_REGION_START equ 0x8000 ;(Don't modify).
 #define GENERAL  1 ; Compatible with dev boards that have a reset button.
 #define XPRESS   2 ; Compatible with the programmer (PIC16F1454) on DM164141 (used it for development).
 #define CUSTOM   3 ; Write your own.
+#ifndef BOARD_VERSION
 #define BOARD_VERSION DM164127
+#endif
 
     if BOARD_VERSION == DM164127
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL ; Could also use MHz_12.
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTA
 #define BUTTON_WPU_BIT    3
@@ -87,7 +109,9 @@ CONFIG_REGION_START equ 0x8000 ;(Don't modify).
     endif
 
     if BOARD_VERSION == GENERAL
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTA
 #define BUTTON_WPU_BIT    3
@@ -96,7 +120,9 @@ CONFIG_REGION_START equ 0x8000 ;(Don't modify).
     endif
 
     if BOARD_VERSION == XPRESS
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL
+#endif
 #define USE_MCLRE
 #define USE_LVP
 #define BUTTON_PORT_BIT   5
@@ -109,7 +135,9 @@ CONFIG_REGION_START equ 0x8000 ;(Don't modify).
     endif
 
     if BOARD_VERSION == CUSTOM
+#ifndef XTAL_USED
 #define XTAL_USED           ; Select oscillator option.
+#endif
 #define USE_MCLRE           ; Uncomment to enable MCLRE (reset pin).
 #define USE_LVP             ; Uncomment if LVP (Low Voltage Programming) is needed.
 #define BUTTON_PORT_BIT     ; Bootloader Button's bit in the I/O PORT.

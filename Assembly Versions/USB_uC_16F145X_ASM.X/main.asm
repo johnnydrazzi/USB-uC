@@ -1,32 +1,45 @@
 ;*******************************************************************************
 ;                                                                              *
-;    This program is free software: you can redistribute it and/or modify      *
-;    it under the terms of the GNU General Public License as published by      *
-;    the Free Software Foundation, either version 3 of the License, or         *
-;    (at your option) any later version.                                       *
+;    Copyright (c) 2024 John Izzard                                            *
 ;                                                                              *
-;    This program is distributed in the hope that it will be useful,           *
-;    but WITHOUT ANY WARRANTY; without even the implied warranty of            *
-;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
-;    GNU General Public License for more details.                              *
+;    Permission is hereby granted, free of charge, to any person obtaining     *
+;    a copy of this software and associated documentation files (the           *
+;    "Software"), to deal in the Software without restriction, including       *
+;    without limitation the rights to use, copy, modify, merge, publish,       *
+;    distribute, sublicense, and/or sell copies of the Software, and to        *
+;    permit persons to whom the Software is furnished to do so, subject to     *
+;    the following conditions:                                                 *
 ;                                                                              *
-;    You should have received a copy of the GNU General Public License         *
-;    along with this program.  If not, see <https://www.gnu.org/licenses/>.    *
+;    The above copyright notice and this permission notice shall be            *
+;    included in all copies or substantial portions of the Software.           *
+;                                                                              *
+;    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,           *
+;    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF        *
+;    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.    *
+;    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY      *
+;    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,      *
+;    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE         *
+;    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                    *
 ;                                                                              *
 ;*******************************************************************************
 ;                                                                              *
 ;    Filename: main.asm                                                        *
-;    Date: 29/04/2021                                                          *
-;    File Version: 1.00                                                        *
+;    Date: 2024-11-12                                                          *
+;    File Version: 1.0.1                                                       *
 ;    Author: John Izzard                                                       *
 ;    Company: N/A                                                              *
 ;    Description: Contains the top most level code of the bootloader.          *
-;                 Compiled using MPLAB X v3.35 & MPLINK 5.09.                  *
+;                 Compiled using MPLAB X v5.35 & MPLINK 5.09.                  *
 ;                 Compiled using MPLAB IDE v8.92 & MPLINK 4.49.                *
 ;                                                                              *
 ;*******************************************************************************
 ;                                                                              *
 ;    Revision History:                                                         *
+;    File Version 1.0.1 - 2024-11-12                                           *
+;    - Changed: MIT license.                                                   *
+;                                                                              *
+;    File Version 1.0.0 - 2021-05-01                                           *
+;    - Added: Initial release.                                                 *
 ;                                                                              *
 ;*******************************************************************************
     radix dec

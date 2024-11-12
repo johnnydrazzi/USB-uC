@@ -1,25 +1,65 @@
 /**
  * @file config.h
- * @brief PIC Microcontroller Settings.
  * @author John Izzard
- * @date 10/03/2023
+ * @date 2024-11-12
  * 
- * USB uC - USB MSD Bootloader.
- * Copyright (C) 2017-2023  John Izzard
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * @brief USB uC - USB MSD Bootloader.
  */
+
+/**
+ * Copyright (C) 2017-2024 John Izzard
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the “Software”), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * Change Log
+ * ----------
+ * File Version 3.0.0 - 2024-11-12
+ * - Changed: MIT License.
+ * - Added: Support for using build scripts. BOARD_VERSION and XTAL guarded.
+ *
+ * File Version 2.0.0 - 2024-01-26
+ * - Changed: Moved XTAL_FREQ to being defined in configuration.
+ * - Added: Support for PIC18F13K50.
+ *
+ * File Version 1.2.2 - 2023-04-14
+ * - Fixed: Default xtal for GENERAL and DEV_BOARD changed to MHz_12.
+ *
+ * File Version 1.2.1 - 2023-04-11
+ * - Added: DEV_BRD -> DEV_BOARD.
+ * - Fixed: Dev board URLs.
+ *
+ * File Version 1.2.0 - 2023-04-07
+ * - Added: Support for _18F4450_FAMILY_, 18FX5J50 and X6J50.
+ * - Changed: X450 and X550, default board is GENERAL.
+ * - Changed: J_PART, default board is DEV_BRD.
+ *
+ * File Version 1.1.0 - 2021-05-01
+ * - Added: Support for more development boards.
+ * - Added: Full support for PIC16F145X.
+ * - Changed: Refactoring.
+ *
+ * File Version 1.0.0 - 2020-06-28
+ * - Added: Initial release of the software.
+ */
+ 
 #ifndef CONFIG_H
 #define CONFIG_H
 
@@ -52,10 +92,14 @@
 #define GENERAL  1 // Compatible with dev boards that have a reset button.
 #define XPRESS   2 // Compatible with the programmer (PIC16F1454) on DM164141 (used it for development).
 #define CUSTOM   3 // Write your own.
+#ifndef BOARD_VERSION
 #define BOARD_VERSION GENERAL
+#endif
 
 #if BOARD_VERSION == DM164127
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL // Could also use MHz_12.
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTA
 #define BUTTON_WPU_BIT    3
@@ -67,7 +111,9 @@
 #define LED_TRIS          TRISC
 
 #elif BOARD_VERSION == GENERAL
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTA
 #define BUTTON_WPU_BIT    3
@@ -75,7 +121,9 @@
 #define BUTTON_ACTIVE_LOW
 
 #elif BOARD_VERSION == XPRESS
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL
+#endif
 #define USE_MCLRE
 #define USE_LVP
 #define BUTTON_PORT_BIT   5
@@ -87,7 +135,9 @@
 #define LED_TRIS          TRISC
 
 #elif BOARD_VERSION == CUSTOM
+#ifndef XTAL_USED
 #define XTAL_USED           // Select oscillator option.
+#endif
 #define USE_MCLRE           // Uncomment to enable MCLRE (reset pin).
 #define USE_LVP             // Uncomment if LVP (Low Voltage Programming) is needed.
 #define BUTTON_PORT_BIT     // Bootloader Button's bit in the I/O PORT.
@@ -109,16 +159,22 @@
 #define GENERAL    0 // Compatible with dev boards that have a reset button.
 #define DEV_BOARD  1 // A custom dev board I use.
 #define CUSTOM     2 // Write your own.
+#ifndef BOARD_VERSION
 #define BOARD_VERSION GENERAL
+#endif
 
 #if BOARD_VERSION == GENERAL
+#ifndef XTAL_USED
 #define XTAL_USED         MHz_12
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTE
 #define BUTTON_ACTIVE_LOW
 
 #elif BOARD_VERSION == DEV_BOARD
+#ifndef XTAL_USED
 #define XTAL_USED         MHz_12
+#endif
 #define USE_MCLRE
 #define USE_LVP
 #define BUTTON_PORT_BIT   6
@@ -129,7 +185,9 @@
 #define LED_TRIS          TRISB
 
 #elif BOARD_VERSION == CUSTOM
+#ifndef XTAL_USED
 #define XTAL_USED           // Select oscillator option.
+#endif
 #define USE_MCLRE           // Uncomment to enable MCLRE (reset pin).
 #define USE_LVP             // Uncomment if LVP (Low Voltage Programming) is needed.
 #define BUTTON_PORT_BIT     // Bootloader Button's bit in the I/O PORT.
@@ -152,10 +210,14 @@
 #define DEV_BOARD  1 // A custom dev board I use.
 #define GENERAL    2 // Compatible with dev boards that have a reset button.
 #define CUSTOM     3 // Write your own.
+#ifndef BOARD_VERSION
 #define BOARD_VERSION GENERAL
+#endif
 
 #if BOARD_VERSION == MIKROE_647
+#ifndef XTAL_USED
 #define XTAL_USED         MHz_8
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTE
 #define BUTTON_ACTIVE_LOW
@@ -165,7 +227,9 @@
 #define LED_TRIS          TRISA
 
 #elif BOARD_VERSION == DEV_BOARD
+#ifndef XTAL_USED
 #define XTAL_USED         MHz_12
+#endif
 #define USE_MCLRE
 #define USE_LVP
 #define BUTTON_PORT_BIT   6
@@ -176,13 +240,17 @@
 #define LED_TRIS          TRISB
 
 #elif BOARD_VERSION == GENERAL
+#ifndef XTAL_USED
 #define XTAL_USED         MHz_12
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTE
 #define BUTTON_ACTIVE_LOW
 
 #elif BOARD_VERSION == CUSTOM
+#ifndef XTAL_USED
 #define XTAL_USED           // Select oscillator option.
+#endif
 #define USE_MCLRE           // Uncomment to enable MCLRE (reset pin).
 #define USE_LVP             // Uncomment if LVP (Low Voltage Programming) is needed.
 #define BUTTON_PORT_BIT     // Bootloader Button's bit in the I/O PORT.
@@ -205,7 +273,9 @@
 #define GENERAL   1 // Compatible with dev boards that have a reset button.
 #define DEV_BOARD 2 // A custom dev board I use.
 #define CUSTOM    3 // Write your own.
+#ifndef BOARD_VERSION
 #define BOARD_VERSION GENERAL
+#endif
 
 #if BOARD_VERSION == DM164127 // Compatible with DM164127-2/DV164139-2 and MonkeyBUS - PIC18F14K50.
 #define BUTTON_PORT_BIT   3
@@ -260,10 +330,14 @@
 #define P_STAR  1 // Compatible with Pololu's P-Star dev boards https://www.pololu.com/category/217/p-star-programmable-controllers
 #define GENERAL 2 // Compatible with dev boards that have a reset button.
 #define CUSTOM  3 // Write your own.
+#ifndef BOARD_VERSION
 #define BOARD_VERSION GENERAL
+#endif
 
 #if BOARD_VERSION == PICDEM
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL
+#endif
 #define USE_MCLRE
 #define USE_LVP
 #define BUTTON_PORT_BIT   4
@@ -277,7 +351,9 @@
 #define LED_TRIS          TRISD
 
 #elif BOARD_VERSION == P_STAR
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL
+#endif
 #define USE_MCLRE
 #define USE_LVP
 #define BUTTON_PORT_BIT   6
@@ -290,7 +366,9 @@
 #define LED_TRIS          TRISB
 
 #elif BOARD_VERSION == GENERAL
+#ifndef XTAL_USED
 #define XTAL_USED         NO_XTAL
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTE
 #define BUTTON_WPU_BIT    7
@@ -298,7 +376,9 @@
 #define BUTTON_ACTIVE_LOW
 
 #elif BOARD_VERSION == CUSTOM
+#ifndef XTAL_USED
 #define XTAL_USED           // Select oscillator option.
+#endif
 #define USE_MCLRE           // Uncomment to enable MCLRE (reset pin).
 #define USE_LVP             // Uncomment if LVP (Low Voltage Programming) is needed.
 #define BUTTON_PORT_BIT     // Bootloader Button's bit in the I/O PORT.
@@ -321,10 +401,14 @@
 #define PIC_CLICKER  1 // Compatible with MikroElektronika's PIC clicker dev board https://www.mikroe.com/clicker-pic18fj
 #define DEV_BOARD    2 // A custom dev board I use.
 #define CUSTOM       3 // Write your own.
+#ifndef BOARD_VERSION
 #define BOARD_VERSION DEV_BOARD
+#endif
 
 #if BOARD_VERSION == PIM
+#ifndef XTAL_USED
 #define XTAL_USED         MHz_12
+#endif
 #define BUTTON_PORT_BIT   2
 #define BUTTON_PORT       PORTB
 #define BUTTON_ANCON_BIT  0
@@ -336,7 +420,9 @@
 #define LED_TRIS          TRISE
 
 #elif BOARD_VERSION == PIC_CLICKER
+#ifndef XTAL_USED
 #define XTAL_USED         MHz_16
+#endif
 #define BUTTON_PORT_BIT   3
 #define BUTTON_PORT       PORTD
 #define BUTTON_ACTIVE_LOW
@@ -346,7 +432,9 @@
 #define LED_TRIS          TRISA
 
 #elif BOARD_VERSION == DEV_BOARD
+#ifndef XTAL_USED
 #define XTAL_USED         MHz_12
+#endif
 #define BUTTON_PORT_BIT   6
 #define BUTTON_PORT       PORTB
 #define USE_BOOT_LED
@@ -355,7 +443,9 @@
 #define LED_TRIS          TRISB
 
 #elif BOARD_VERSION == CUSTOM
+#ifndef XTAL_USED
 #define XTAL_USED           // Select oscillator option.
+#endif
 #define BUTTON_PORT_BIT     // Bootloader Button's bit in the I/O PORT.
 #define BUTTON_PORT         // Bootloader Button's I/O PORT.
 //#define BUTTON_ANCON_BIT  // Uncomment and define the Bootloader Button's pin to make digital (if needed).

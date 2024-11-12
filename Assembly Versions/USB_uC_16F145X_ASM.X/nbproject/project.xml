@@ -12,6 +12,26 @@
             <asminc-extensions>inc</asminc-extensions>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
+            <sourceRootList>
+                <sourceRootElem>.</sourceRootElem>
+            </sourceRootList>
+            <confList>
+                <confElem>
+                    <name>PIC16F1454</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC16F1455</name>
+                    <type>2</type>
+                </confElem>
+                <confElem>
+                    <name>PIC16F1459</name>
+                    <type>2</type>
+                </confElem>
+            </confList>
+            <formatting>
+                <project-formatting-style>false</project-formatting-style>
+            </formatting>
         </data>
     </configuration>
 </project>

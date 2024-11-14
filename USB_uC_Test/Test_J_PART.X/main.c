@@ -1,3 +1,53 @@
+/**
+ * @file main.c
+ * @author John Izzard
+ * @date 2024-11-12
+ * 
+ * @brief Main C file.
+ */
+
+/**
+ * Copyright (C) 2017-2024 John Izzard
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the “Software”), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+ /**
+ * Change Log
+ * ----------
+ * File Version 4.0.0 - 2024-11-12
+ * - Changed: MIT License.
+ * - Added: Support for build script.
+ *
+ * File Version 3.0.0 - 2023-04-11
+ * - Added: Support for X4J50, X5J50 and X6J50.
+ * - Removed: Irrelevant XTAL options.
+ * - Changed: Default board is DEV_BOARD.
+ * - Changed: Folder name to Test_J_PART.
+ *
+ * File Version 2.0.0 - 2021-05-01 (was separate files)
+ * - Changed: Refactoring.
+ * - Added: Support for dev boards.
+ *
+ * File Version 1.0.0 - 2020-06-28
+ * - Added: Initial release of the software.
+ */
 
 #include <xc.h>
 #include <stdint.h>
@@ -6,7 +56,9 @@
 #define PIC_CLICKER  1 // Compatible with MikroElektronika's PIC clicker dev board https://www.mikroe.com/clicker-pic18fj.
 #define DEV_BOARD    2 // A custom dev board I use.
 #define CUSTOM       3 // Write your own.
+#ifndef BOARD_VERSION
 #define BOARD_VERSION DEV_BOARD
+#endif
 
 #if BOARD_VERSION == PIM
 #define BUTTON_PORT_BIT   2
